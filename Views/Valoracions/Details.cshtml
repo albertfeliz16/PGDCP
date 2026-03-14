@@ -1,0 +1,46 @@
+@model PGDCP.Models.Valoracion
+@{ ViewData["Title"] = "Detalle de Valoración"; }
+
+<div class="page-header">
+    <h1>Valoración Pericial</h1>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-sm btn-outline-light">Editar</a>
+        <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Volver</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card fade-in">
+            <div class="card-header">Ficha de Peritaje #@Model?.Id</div>
+            <div class="card-body">
+                <div class="detail-grid">
+                    <div>
+                        <div class="detail-label">Obra valorada</div>
+                        <div class="detail-value">@(Model?.Obra?.Titulo ?? $"Obra #{Model?.ObraId}")</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Fecha de valoración</div>
+                        <div class="detail-value">@Model?.FechaValoracion.ToString("d MMMM yyyy")</div>
+                    </div>
+                </div>
+                <hr class="divider">
+                <div>
+                    <div class="detail-label">Valor determinado</div>
+                    <div style="font-family:var(--fd);font-size:2.2rem;color:var(--gold-light);margin-top:.3rem;">
+                        $@Model?.ValorEstimado.ToString("N2") <span style="font-size:1rem;color:var(--text-muted);">USD</span>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model?.Observaciones))
+                {
+                    <hr class="divider">
+                    <div>
+                        <div class="detail-label">Observaciones</div>
+                        <div style="color:var(--text);line-height:1.75;margin-top:.4rem;">@Model.Observaciones</div>
+                    </div>
+                }
+                <hr class="divider">
+                <div><div class="detail-label">ID del Perito</div><div style="color:var(--text-muted);font-size:.85rem;margin-top:.2rem;">@(Model?.PeritoId ?? "No registrado")</div></div>
+            </div>
+        </div>
+    </div>
+</div>

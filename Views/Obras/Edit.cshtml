@@ -1,0 +1,78 @@
+@model Obra
+@{ ViewData["Title"] = "Editar Obra"; }
+
+<div class="page-header">
+    <h1>Editar Obra</h1>
+    <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-sm" style="color:var(--text-muted);">← Cancelar</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card fade-in">
+            <div class="card-header">Editando: @Model?.Titulo</div>
+            <div class="card-body">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label asp-for="Titulo" class="form-label">Título *</label>
+                                <input asp-for="Titulo" class="form-control" />
+                                <span asp-validation-for="Titulo" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Autor" class="form-label">Autor</label>
+                                <input asp-for="Autor" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Epoca" class="form-label">Época</label>
+                                <input asp-for="Epoca" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Estilo" class="form-label">Estilo</label>
+                                <input asp-for="Estilo" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Material" class="form-label">Material</label>
+                                <input asp-for="Material" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="FechaAdquisicion" class="form-label">Fecha de Adquisición</label>
+                                <input asp-for="FechaAdquisicion" class="form-control" type="date" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ValorEstimado" class="form-label">Valor Estimado (USD)</label>
+                                <input asp-for="ValorEstimado" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="ImagenUrl" class="form-label">URL de imagen</label>
+                                <input asp-for="ImagenUrl" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="divider">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-outline-light">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

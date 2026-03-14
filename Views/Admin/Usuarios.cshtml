@@ -1,0 +1,129 @@
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    var usersWithRoles = ViewBag.UsersWithRoles as List<(Microsoft.AspNetCore.Identity.IdentityUser User, IList<string> Roles)>;
+    var allRoles = ViewBag.AllRoles as List<string>;
+}
+
+<div class="page-header">
+    <h1>Gestión de Usuarios</h1>
+    <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Panel Admin</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-3">✓ @TempData["Success"]</div>
+}
+
+<div class="role-callout">
+    <span>ℹ</span>
+    <span>Asigna el rol correcto a cada usuario. Cada usuario tiene <strong>un solo rol activo</strong>.
+    El rol determina a qué módulos puede acceder y qué acciones puede realizar.</span>
+</div>
+
+<div class="card fade-in mt-3">
+    <div class="card-header">Usuarios del sistema (@(usersWithRoles?.Count ?? 0))</div>
+    <div class="table-wrapper" style="border:none;border-radius:0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Email / Usuario</th>
+                    <th>Rol actual</th>
+                    <th>Asignar nuevo rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (usersWithRoles != null)
+                {
+                    @foreach (var (user, roles) in usersWithRoles)
+                    {
+                        <tr>
+                            <td>
+                                <div style="font-family:var(--fd);color:var(--ivory);">@user.Email</div>
+                                <div style="color:var(--text-muted);font-size:.75rem;margin-top:.15rem;">ID: @(user.Id.Length > 12 ? user.Id[..12] + "..." : user.Id)</div>
+                            </td>
+                            <td>
+                                @if (!roles.Any())
+                                {
+                                    <span class="badge badge-rose">Sin rol</span>
+                                }
+                                else
+                                {
+                                    @foreach (var rol in roles)
+                                    {
+                                        @if (rol == "Administrador") { <span class="badge badge-gold">@rol</span> }
+                                        else if (rol == "Restaurador") { <span class="badge badge-teal">@rol</span> }
+                                        else if (rol == "Perito") { <span class="badge badge-purple">@rol</span> }
+                                        else { <span class="badge badge-rose">@rol</span> }
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <form asp-action="AsignarRol" method="post" class="d-flex gap-2 align-items-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <select name="rol" class="form-select" style="max-width:180px;font-size:.82rem;padding:.35rem .7rem;">
+                                        @if (allRoles != null)
+                                        {
+                                            @foreach (var r in allRoles)
+                                            {
+                                                if (roles.Contains(r))
+                                                {
+                                                    <option value="@r" selected="selected">@r</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@r">@r</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Asignar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div style="max-width:750px;">
+    <h3 style="font-size:1.2rem;margin-bottom:1rem;">Descripción de roles</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card" style="padding:1rem;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge badge-gold">Administrador</span>
+                </div>
+                <p style="color:var(--text-muted);font-size:.82rem;margin:0;">Acceso completo. Ve todas las obras, puede eliminar cualquier registro, gestiona usuarios y ve el panel de administración.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="padding:1rem;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge badge-teal">Restaurador</span>
+                </div>
+                <p style="color:var(--text-muted);font-size:.82rem;margin:0;">Accede al módulo de Conservación. Puede crear y editar registros de restauración. No puede eliminar ni acceder a valoraciones.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="padding:1rem;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge badge-purple">Perito</span>
+                </div>
+                <p style="color:var(--text-muted);font-size:.82rem;margin:0;">Accede al módulo de Valoraciones. Puede crear y editar peritajes. Ve el valor estimado de las obras. No puede eliminar ni acceder a conservación.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="padding:1rem;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge badge-rose">Coleccionista</span>
+                </div>
+                <p style="color:var(--text-muted);font-size:.82rem;margin:0;">Usuario estándar. Solo puede ver y gestionar sus propias obras. No tiene acceso a conservación, valoraciones ni al panel de administración.</p>
+            </div>
+        </div>
+    </div>
+</div>

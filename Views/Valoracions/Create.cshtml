@@ -1,0 +1,58 @@
+@model PGDCP.Models.Valoracion
+@{ ViewData["Title"] = "Nueva Valoración"; }
+
+<div class="page-header">
+    <h1>Nueva Valoración Pericial</h1>
+    <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Volver</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card fade-in">
+            <div class="card-header">Datos del Peritaje</div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label asp-for="ObraId" class="form-label">Obra *</label>
+                                <select asp-for="ObraId" class="form-select" asp-items="ViewBag.ObraId">
+                                    <option value="">— Seleccione una obra —</option>
+                                </select>
+                                <span asp-validation-for="ObraId" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="FechaValoracion" class="form-label">Fecha *</label>
+                                <input asp-for="FechaValoracion" class="form-control" type="date" />
+                                <span asp-validation-for="FechaValoracion" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="ValorEstimado" class="form-label">Valor Determinado (USD) *</label>
+                                <input asp-for="ValorEstimado" class="form-control" placeholder="0.00" />
+                                <span asp-validation-for="ValorEstimado" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="Observaciones" class="form-label">Observaciones y notas técnicas</label>
+                                <textarea asp-for="Observaciones" class="form-control" rows="4" placeholder="Contexto del peritaje, metodología empleada, notas adicionales..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:.5rem;">El perito quedará registrado automáticamente con tu usuario.</p>
+                    <hr class="divider">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar valoración</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

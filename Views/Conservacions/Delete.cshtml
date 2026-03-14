@@ -1,0 +1,26 @@
+@model Conservacion
+@{ ViewData["Title"] = "Eliminar Registro"; }
+
+<div class="page-header"><h1>Confirmar eliminación</h1></div>
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card fade-in" style="border-color:rgba(166,61,47,.3);">
+            <div class="card-header" style="background:rgba(166,61,47,.08);border-color:rgba(166,61,47,.25);color:#fca5a5;">¿Eliminar este registro de conservación?</div>
+            <div class="card-body">
+                <div class="detail-grid" style="grid-template-columns:1fr;">
+                    <div><div class="detail-label">Obra (ID)</div><div class="detail-value"><span class="badge badge-gold">#@Model?.ObraId</span></div></div>
+                    <div><div class="detail-label">Diagnóstico</div><div class="detail-value" style="font-size:.95rem;">@Model?.Diagnostico</div></div>
+                    <div><div class="detail-label">Fecha intervención</div><div class="detail-value" style="font-size:.95rem;">@Model?.FechaIntervencion.ToString("dd/MM/yyyy")</div></div>
+                </div>
+                <hr class="divider">
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2 justify-content-end mt-2">
+                        <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
+                        <button type="submit" class="btn btn-danger">Eliminar definitivamente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

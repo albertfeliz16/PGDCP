@@ -1,0 +1,26 @@
+﻿@model PGDCP.Models.PerfilUsuario
+@{
+    ViewData["Title"] = "Mi Perfil - Restaurador";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h3>Perfil de Restaurador</h3>
+        </div>
+        <div class="card-body">
+            <h5>Bienvenido, @Model.Nombre @Model.Apellido</h5>
+            <hr />
+            <p><strong>Teléfono:</strong> @Model.Telefono</p>
+            <p><strong>Fecha de nacimiento:</strong> @Model.FechaNacimiento.ToShortDateString()</p>
+            <hr />
+            <h5>Accesos rápidos</h5>
+            <a asp-controller="Conservacions" asp-action="Index" class="btn btn-warning">
+                Ver Conservaciones
+            </a>
+            <a asp-controller="Conservacions" asp-action="Create" class="btn btn-outline-warning ms-2">
+                Nueva Conservación
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+@model Conservacion
+@{ ViewData["Title"] = "Registrar Conservación"; }
+
+<div class="page-header">
+    <h1>Registro de Conservación</h1>
+    <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Volver</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card fade-in">
+            <div class="card-header">Nueva Intervención de Restauración</div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label asp-for="ObraId" class="form-label">Obra *</label>
+                                <select asp-for="ObraId" class="form-select" asp-items="ViewBag.ObraId">
+                                    <option value="">— Seleccione una obra —</option>
+                                </select>
+                                <span asp-validation-for="ObraId" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="FechaIntervencion" class="form-label">Fecha de Intervención</label>
+                                <input asp-for="FechaIntervencion" class="form-control" type="date" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="Diagnostico" class="form-label">Diagnóstico *</label>
+                                <textarea asp-for="Diagnostico" class="form-control" rows="3" placeholder="Describe el estado actual de la obra..."></textarea>
+                                <span asp-validation-for="Diagnostico" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="Tratamiento" class="form-label">Tratamiento aplicado</label>
+                                <textarea asp-for="Tratamiento" class="form-control" rows="3" placeholder="Describe el tratamiento o intervención realizada..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:.5rem;">
+                        El restaurador quedará registrado automáticamente con tu usuario.
+                    </p>
+                    <hr class="divider">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

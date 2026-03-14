@@ -1,0 +1,33 @@
+@model Obra
+@{ ViewData["Title"] = "Eliminar Obra"; }
+
+<div class="page-header"><h1>Confirmar eliminación</h1></div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card fade-in" style="border-color:rgba(166,61,47,.3);">
+            <div class="card-header" style="background:rgba(166,61,47,.08);border-color:rgba(166,61,47,.25);color:#fca5a5;">
+                ¿Eliminar esta obra permanentemente?
+            </div>
+            <div class="card-body">
+                <div class="detail-grid" style="grid-template-columns:1fr;">
+                    <div><div class="detail-label">Título</div><div class="detail-value">@Model?.Titulo</div></div>
+                    <div><div class="detail-label">Autor</div><div class="detail-value">@Model?.Autor</div></div>
+                    <div>
+                        <div class="detail-label">Valor Estimado</div>
+                        <div class="detail-value" style="color:var(--gold-light);">$@Model?.ValorEstimado.ToString("N2")</div>
+                    </div>
+                </div>
+                <hr class="divider">
+                <p style="color:var(--text-muted);font-size:.83rem;">Esta acción no se puede deshacer. Se eliminarán todos los datos de esta obra.</p>
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2 justify-content-end mt-3">
+                        <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
+                        <button type="submit" class="btn btn-danger">Eliminar definitivamente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

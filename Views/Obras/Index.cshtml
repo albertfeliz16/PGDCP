@@ -1,0 +1,106 @@
+@model IEnumerable<Obra>
+@{
+    ViewData["Title"] = "Catálogo de Obras";
+    var isAdmin = User.IsInRole("Administrador");
+    var canCreate = User.IsInRole("Administrador") || User.IsInRole("Coleccionista") || (!User.IsInRole("Restaurador") && !User.IsInRole("Perito"));
+}
+
+<div class="page-header">
+    <h1>Catálogo de Obras</h1>
+    @if (canCreate)
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Registrar obra</a>
+    }
+</div>
+
+@if (isAdmin)
+{
+    <div class="role-callout"><span>👑</span><span>Vista de <strong>Administrador</strong> — mostrando todas las obras del sistema.</span></div>
+}
+else if (User.IsInRole("Restaurador"))
+{
+    <div class="role-callout"><span>🔬</span><span>Vista de <strong>Restaurador</strong> — puedes consultar las obras para registrar sus conservaciones.</span></div>
+}
+else if (User.IsInRole("Perito"))
+{
+    <div class="role-callout"><span>⚖</span><span>Vista de <strong>Perito</strong> — puedes consultar las obras para registrar valoraciones.</span></div>
+}
+else
+{
+    <div class="role-callout"><span>🖼</span><span>Vista de <strong>Coleccionista</strong> — mostrando únicamente tus obras registradas.</span></div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">🖼</div>
+        <h3>Sin obras registradas</h3>
+        <p>@(canCreate ? "Comienza registrando la primera pieza de tu colección." : "No hay obras disponibles.")</p>
+        @if (canCreate) { <a asp-action="Create" class="btn btn-primary mt-3">Registrar primera obra</a> }
+    </div>
+}
+else
+{
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <div class="search-bar">
+                <input type="text" id="tableSearch" placeholder="Buscar por título, autor, época..." />
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+        <div class="toolbar-right" style="color:var(--text-muted);font-size:.78rem;">
+            @Model.Count() obra(s) encontrada(s)
+        </div>
+    </div>
+
+    <div class="table-wrapper fade-in">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Época</th>
+                        <th>Estilo</th>
+                        <th>Material</th>
+                        <th>Adquisición</th>
+                        @if (isAdmin || User.IsInRole("Perito")) { <th>Valor estimado</th> }
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span style="font-family:var(--fd);color:var(--ivory);">@item.Titulo</span></td>
+                            <td>@item.Autor</td>
+                            <td><span class="badge badge-teal">@item.Epoca</span></td>
+                            <td>@item.Estilo</td>
+                            <td>@item.Material</td>
+                            <td class="muted-sm" style="color:var(--text-muted);font-size:.82rem;">@item.FechaAdquisicion.ToString("dd/MM/yyyy")</td>
+                            @if (isAdmin || User.IsInRole("Perito"))
+                            {
+                                <td><span style="color:var(--gold-light);font-family:var(--fd);">$@item.ValorEstimado.ToString("N0")</span></td>
+                            }
+                            <td>
+                                <div class="action-links">
+                                    <a class="action-link" asp-action="Details" asp-route-id="@item.Id">Ver</a>
+                                    @if (isAdmin || item.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                                    {
+                                        <span class="action-sep">·</span>
+                                        <a class="action-link" asp-action="Edit" asp-route-id="@item.Id">Editar</a>
+                                    }
+                                    @if (isAdmin)
+                                    {
+                                        <span class="action-sep">·</span>
+                                        <a class="action-link danger" asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

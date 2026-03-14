@@ -1,0 +1,10 @@
+@model PGDCP.Models.ErrorViewModel
+@{ ViewData["Title"] = "Error"; }
+<div class="page-header"><h1>Error del sistema</h1></div>
+<div class="card fade-in" style="max-width:600px;">
+    <div class="card-body">
+        <p style="color:var(--text-muted);">Ocurrió un error inesperado. Por favor intenta nuevamente.</p>
+        @if (Model.ShowRequestId) { <p style="color:var(--text-muted);font-size:.8rem;">Request ID: @Model.RequestId</p> }
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-light mt-2">Volver al inicio</a>
+    </div>
+</div>

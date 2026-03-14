@@ -1,0 +1,26 @@
+﻿@model PGDCP.Models.PerfilUsuario
+@{
+    ViewData["Title"] = "Mi Perfil - Perito";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h3>Perfil de Perito</h3>
+        </div>
+        <div class="card-body">
+            <h5>Bienvenido, @Model.Nombre @Model.Apellido</h5>
+            <hr />
+            <p><strong>Teléfono:</strong> @Model.Telefono</p>
+            <p><strong>Fecha de nacimiento:</strong> @Model.FechaNacimiento.ToShortDateString()</p>
+            <hr />
+            <h5>Accesos rápidos</h5>
+            <a asp-controller="Valoracions" asp-action="Index" class="btn btn-success">
+                Ver Valoraciones
+            </a>
+            <a asp-controller="Valoracions" asp-action="Create" class="btn btn-outline-success ms-2">
+                Nueva Valoración
+            </a>
+        </div>
+    </div>
+</div>

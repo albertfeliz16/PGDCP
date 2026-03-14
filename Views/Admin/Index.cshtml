@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Panel de Administración";
+}
+
+<div class="page-header">
+    <h1>Panel de <em style="color:var(--gold-light);">Administración</em></h1>
+    <span class="badge badge-gold">Acceso Privilegiado</span>
+</div>
+
+<div class="stats-grid stagger">
+    <div class="stat-card"><div class="stat-label">Total obras</div><div class="stat-value">@ViewBag.TotalObras</div><div class="stat-sub">En el sistema</div></div>
+    <div class="stat-card"><div class="stat-label">Conservaciones</div><div class="stat-value">@ViewBag.TotalConservaciones</div><div class="stat-sub">Registros técnicos</div></div>
+    <div class="stat-card"><div class="stat-label">Valoraciones</div><div class="stat-value">@ViewBag.TotalValoraciones</div><div class="stat-sub">Peritajes registrados</div></div>
+    <div class="stat-card"><div class="stat-label">Valor total</div><div class="stat-value" style="font-size:1.5rem;">$@String.Format("{0:N0}", ViewBag.ValorTotal)</div><div class="stat-sub">USD estimado</div></div>
+    <div class="stat-card"><div class="stat-label">Usuarios</div><div class="stat-value">@ViewBag.TotalUsuarios</div><div class="stat-sub">Registrados</div></div>
+</div>
+
+<hr class="divider">
+
+<div class="page-header" style="margin-bottom:1rem;">
+    <h2 style="font-size:1.5rem;">Gestión de módulos</h2>
+</div>
+<div class="row g-3 stagger" style="max-width:900px;">
+    <div class="col-md-4">
+        <div class="card"><div class="card-header">Obras</div>
+        <div class="card-body d-flex flex-column gap-2">
+            <a asp-controller="Obras" asp-action="Index" class="btn btn-outline-light btn-sm w-100">Ver catálogo completo</a>
+            <a asp-controller="Obras" asp-action="Create" class="btn btn-primary btn-sm w-100">+ Agregar obra</a>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-header">Conservación</div>
+        <div class="card-body d-flex flex-column gap-2">
+            <a asp-controller="Conservacions" asp-action="Index" class="btn btn-outline-light btn-sm w-100">Ver registros</a>
+            <a asp-controller="Conservacions" asp-action="Create" class="btn btn-teal btn-sm w-100">+ Nuevo registro</a>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-header">Valoraciones</div>
+        <div class="card-body d-flex flex-column gap-2">
+            <a asp-controller="Valoracions" asp-action="Index" class="btn btn-outline-light btn-sm w-100">Ver valoraciones</a>
+            <a asp-controller="Valoracions" asp-action="Create" class="btn btn-outline-light btn-sm w-100">+ Nueva valoración</a>
+        </div></div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div class="page-header" style="margin-bottom:1rem;">
+    <h2 style="font-size:1.5rem;">Gestión de usuarios y roles</h2>
+    <a asp-action="Usuarios" class="btn btn-primary btn-sm">Ver todos los usuarios</a>
+</div>
+<p style="color:var(--text-muted);font-size:.88rem;max-width:650px;">
+    Asigna roles a cada usuario del sistema. El rol determina a qué módulos puede acceder y qué acciones puede realizar.
+    Los roles disponibles son: <strong style="color:var(--gold-light);">Administrador</strong>,
+    <strong style="color:#5eead4;">Restaurador</strong>,
+    <strong style="color:#c4b5fd;">Perito</strong> y
+    <strong style="color:#fca5a5;">Coleccionista</strong>.
+</p>
