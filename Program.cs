@@ -19,14 +19,22 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequireDigit           = true;
-    options.Password.RequiredLength         = 6;
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase       = false;
+    options.Password.RequireUppercase = false;
 })
 .AddRoles<IdentityRole>()
 .AddErrorDescriber<SpanishIdentityErrorDescriber>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// ── Redirigir al login personalizado ──
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login";
+    options.LogoutPath = "/Login/Salir";
+    options.AccessDeniedPath = "/Home/Index";
+});
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -55,30 +63,17 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// ── Crear roles y usuario administrador por defecto ──
+// ── Crear solo los roles por defecto ──
+// El usuario administrador se crea manualmente desde la base de datos
 using (var scope = app.Services.CreateScope())
 {
-    var services     = scope.ServiceProvider;
-    var roleManager  = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager  = services.GetRequiredService<UserManager<IdentityUser>>();
+    var services = scope.ServiceProvider;
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
     string[] roles = { "Administrador", "Restaurador", "Perito", "Coleccionista" };
     foreach (var role in roles)
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
-
-    // Crear usuario admin por defecto si no existe
-    const string adminEmail    = "admin@pgdcp.com";
-    const string adminPassword = "Admin123!";
-
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    if (adminUser == null)
-    {
-        adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-        var result = await userManager.CreateAsync(adminUser, adminPassword);
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(adminUser, "Administrador");
-    }
 }
 
 app.Run();

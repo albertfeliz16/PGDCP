@@ -1,0 +1,206 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<style>
+    .login-wrapper {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+
+    .login-card {
+        background: #ffffff;
+        border: 1px solid rgba(154,123,62,.18);
+        border-radius: 16px;
+        box-shadow: 0 8px 40px rgba(90,60,20,.1);
+        width: 100%;
+        max-width: 420px;
+        overflow: hidden;
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, rgba(154,123,62,.08) 0%, rgba(154,123,62,.03) 100%);
+        border-bottom: 1px solid rgba(154,123,62,.14);
+        padding: 2.2rem 2.5rem 1.8rem;
+        text-align: center;
+    }
+
+        .login-header .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gold, #9A7B3E);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            margin: 0 auto 1rem;
+        }
+
+        .login-header h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.9rem;
+            font-weight: 300;
+            color: #5C3D1E;
+            margin: 0 0 .3rem;
+        }
+
+        .login-header p {
+            color: #8C7055;
+            font-size: .85rem;
+            margin: 0;
+        }
+
+    .login-body {
+        padding: 2rem 2.5rem 2rem;
+    }
+
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: .28rem;
+        margin-bottom: .9rem;
+    }
+
+        .field-group label {
+            font-size: .68rem;
+            font-weight: 400;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            color: #8C7055;
+        }
+
+        .field-group input {
+            background: #FAF6EF;
+            border: 1px solid rgba(154,123,62,.2);
+            border-radius: 6px;
+            color: #3B2A1A;
+            padding: .62rem .88rem;
+            font-size: .92rem;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+            width: 100%;
+        }
+
+            .field-group input:focus {
+                background: #ffffff;
+                border-color: #9A7B3E;
+                box-shadow: 0 0 0 3px rgba(154,123,62,.1);
+                outline: none;
+            }
+
+    .remember-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: 1.2rem;
+    }
+
+        .remember-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #9A7B3E;
+            cursor: pointer;
+        }
+
+        .remember-row label {
+            font-size: .82rem;
+            color: #8C7055;
+            cursor: pointer;
+        }
+
+    .error-box {
+        background: rgba(166,61,47,.07);
+        border: 1px solid rgba(166,61,47,.22);
+        border-radius: 8px;
+        padding: .75rem 1rem;
+        margin-bottom: 1.2rem;
+        color: #A63D2F;
+        font-size: .85rem;
+    }
+
+    .btn-login {
+        width: 100%;
+        background: #9A7B3E;
+        border: none;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: .82rem;
+        font-weight: 500;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        padding: .85rem;
+        transition: background .2s, box-shadow .2s, transform .15s;
+        cursor: pointer;
+    }
+
+        .btn-login:hover {
+            background: #B8973F;
+            box-shadow: 0 4px 18px rgba(154,123,62,.28);
+            transform: translateY(-1px);
+        }
+
+    .login-footer {
+        text-align: center;
+        padding: 1.2rem 2.5rem 1.8rem;
+        border-top: 1px solid rgba(154,123,62,.1);
+        font-size: .83rem;
+        color: #8C7055;
+    }
+
+        .login-footer a {
+            color: #9A7B3E;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+            .login-footer a:hover {
+                color: #B8973F;
+                text-decoration: underline;
+            }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <div class="login-header">
+            <div class="brand-icon"></div>
+            <h1>Bienvenido</h1>
+            <p>Ingresa tus credenciales para continuar</p>
+        </div>
+
+        <div class="login-body">
+            <form method="post" asp-action="Index" asp-controller="Login">
+                @Html.AntiForgeryToken()
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error-box">⚠ @ViewBag.Error</div>
+                }
+
+                <div class="field-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email"
+                           placeholder="nombre@ejemplo.com" required />
+                </div>
+
+                <div class="field-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password"
+                           placeholder="Tu contraseña" required />
+                </div>
+
+                <div class="remember-row">
+                    <input type="checkbox" id="recordarme" name="recordarme" value="true" />
+                    <label for="recordarme">Recordarme</label>
+                </div>
+
+                <button type="submit" class="btn-login">Iniciar sesión</button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            ¿No tienes cuenta? <a asp-controller="Home" asp-action="Index"
+                                  onclick="location.href='/Identity/Account/Register'">Regístrate aquí</a>
+        </div>
+
+    </div>
+</div>

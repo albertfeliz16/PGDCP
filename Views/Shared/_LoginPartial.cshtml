@@ -3,26 +3,47 @@
 @inject UserManager<IdentityUser> UserManager
 
 <ul class="navbar-nav align-items-center gap-2">
-@if (SignInManager.IsSignedIn(User))
-{
-    @if (User.IsInRole("Administrador"))       { <li class="nav-item"><span class="role-pill role-admin">Administrador</span></li> }
-    else if (User.IsInRole("Restaurador"))     { <li class="nav-item"><span class="role-pill role-rest">Restaurador</span></li> }
-    else if (User.IsInRole("Perito"))          { <li class="nav-item"><span class="role-pill role-perito">Perito</span></li> }
-    else                                       { <li class="nav-item"><span class="role-pill role-col">Coleccionista</span></li> }
-    <li class="nav-item">
-        <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index"
-           style="color:var(--gold)!important;font-size:.78rem;">@User.Identity?.Name</a>
-    </li>
-    <li class="nav-item">
-        <form class="m-0" asp-area="Identity" asp-page="/Account/Logout"
-              asp-route-returnUrl="@Url.Action("Index","Home",new{area=""})">
-            <button type="submit" class="btn btn-sm" style="border-color:rgba(201,168,76,.28);color:var(--text-muted);font-size:.7rem;">Salir</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Registrarse</a></li>
-    <li class="nav-item"><a class="btn btn-sm btn-gold ms-1" asp-area="Identity" asp-page="/Account/Login">Iniciar sesión</a></li>
-}
+    @if (SignInManager.IsSignedIn(User))
+    {
+        @if (User.IsInRole("Administrador"))
+        {
+            <li class="nav-item"><span class="role-pill role-admin">Administrador</span></li>
+        }
+        else if (User.IsInRole("Restaurador"))
+        {
+            <li class="nav-item"><span class="role-pill role-rest">Restaurador</span></li>
+        }
+        else if (User.IsInRole("Perito"))
+        {
+            <li class="nav-item"><span class="role-pill role-perito">Perito</span></li>
+        }
+        else
+        {
+            <li class="nav-item"><span class="role-pill role-col">Coleccionista</span></li>
+        }
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index"
+               style="color:var(--gold)!important;font-size:.78rem;">@User.Identity?.Name</a>
+        </li>
+        <li class="nav-item">
+            <form class="m-0" asp-controller="Login" asp-action="Salir" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm"
+                        style="border-color:rgba(201,168,76,.28);color:var(--text-muted);font-size:.7rem;">
+                    Salir
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Registrarse</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-sm btn-gold ms-1" asp-controller="Login" asp-action="Index">
+                Iniciar sesión
+            </a>
+        </li>
+    }
 </ul>

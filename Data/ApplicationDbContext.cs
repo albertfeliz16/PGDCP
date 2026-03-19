@@ -15,6 +15,8 @@ namespace PGDCP.Data
         public DbSet<Conservacion> Conservaciones { get; set; }
         public DbSet<Valoracion> Valoraciones { get; set; }
 
+        public DbSet<LoginUsuario> LoginUsuarios { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

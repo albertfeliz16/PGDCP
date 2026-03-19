@@ -7,14 +7,11 @@
 @if (!User.Identity?.IsAuthenticated ?? true)
 {
     @* ─── HERO PÚBLICO ─── *@
+    @* ─── HERO PÚBLICO ─── *@
     <section class="hero">
         <span class="hero-eyebrow">Patrimonio Cultural Privado</span>
         <h1>Gestión <em>Digital</em><br>de Colecciones</h1>
         <p class="hero-sub">Centraliza, documenta y protege tu patrimonio cultural. Expedientes técnicos, valoraciones, conservación y certificación en una sola plataforma.</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Iniciar sesión</a>
-            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light">Registrarse</a>
-        </div>
         <div class="ornament" style="max-width:400px;margin:2.5rem auto 0;">Plataforma Privada · Acceso Controlado</div>
     </section>
     <hr class="divider">

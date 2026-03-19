@@ -1,7 +1,7 @@
 ﻿@model PGDCP.Models.PerfilUsuario
 @{
     ViewData["Title"] = "Editar Usuario";
-    var user = ViewBag.User as Microsoft.AspNetCore.Identity.IdentityUser;
+    var user = ViewBag.User as Microsoft.AspNetCore.Identity.IdentityUser ?? new Microsoft.AspNetCore.Identity.IdentityUser();
     var roles = ViewBag.AllRoles as List<string>;
     var rolAct = ViewBag.RolActual as string;
 }
