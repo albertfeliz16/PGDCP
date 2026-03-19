@@ -77,6 +77,7 @@ namespace PGDCP.Areas.Identity.Pages.Account
             // Fecha de nacimiento
             [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
             [DataType(DataType.Date)]
+            [MayorDeEdad]
             [Display(Name = "Fecha de nacimiento")]
             public DateTime FechaNacimiento { get; set; }
 

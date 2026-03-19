@@ -16,8 +16,10 @@
 
 <div class="role-callout">
     <span>ℹ</span>
-    <span>Asigna el rol correcto a cada usuario. Cada usuario tiene <strong>un solo rol activo</strong>.
-    El rol determina a qué módulos puede acceder y qué acciones puede realizar.</span>
+    <span>
+        Asigna el rol correcto a cada usuario. Cada usuario tiene <strong>un solo rol activo</strong>.
+        El rol determina a qué módulos puede acceder y qué acciones puede realizar.
+    </span>
 </div>
 
 <div class="card fade-in mt-3">
@@ -29,6 +31,7 @@
                     <th>Email / Usuario</th>
                     <th>Rol actual</th>
                     <th>Asignar nuevo rol</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,10 +53,25 @@
                                 {
                                     @foreach (var rol in roles)
                                     {
-                                        @if (rol == "Administrador") { <span class="badge badge-gold">@rol</span> }
-                                        else if (rol == "Restaurador") { <span class="badge badge-teal">@rol</span> }
-                                        else if (rol == "Perito") { <span class="badge badge-purple">@rol</span> }
-                                        else { <span class="badge badge-rose">@rol</span> }
+                                        @if (rol == "Administrador")
+                                        {
+                                            <span class="badge badge-gold">@rol</span>
+                                        }
+                                        else if (rol == "Restaurador")
+                                        {
+
+                                            <span class="badge badge-teal">@rol</span>
+                                        }
+                                        else if (rol == "Perito")
+                                        {
+
+                                            <span class="badge badge-purple">@rol</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge badge-rose">@rol</span>
+                                        }
                                     }
                                 }
                             </td>
@@ -79,6 +97,18 @@
                                     </select>
                                     <button type="submit" class="btn btn-sm btn-primary">Asignar</button>
                                 </form>
+                            </td>
+                            <td>
+                                <a asp-action="EditarUsuario"
+                                   asp-route-userId="@user.Id"
+                                   class="btn btn-sm btn-warning">
+                                    Editar
+                                </a>
+                                <a asp-action="EliminarUsuario"
+                                   asp-route-userId="@user.Id"
+                                   class="btn btn-sm btn-danger ms-1">
+                                    Eliminar
+                                </a>
                             </td>
                         </tr>
                     }

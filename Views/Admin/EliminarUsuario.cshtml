@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Eliminar Usuario";
+    var user = ViewBag.User
+        as Microsoft.AspNetCore.Identity.IdentityUser;
+    var perfil = ViewBag.Perfil as PGDCP.Models.PerfilUsuario;
+    var rol = ViewBag.Rol as string;
+}
+
+<h2>Eliminar Usuario</h2>
+<hr />
+
+<div class="alert alert-danger">
+    <strong>Estas seguro de que deseas eliminar este usuario?</strong>
+    <p>Esta accion no se puede deshacer.</p>
+</div>
+
+<div class="card mb-4" style="max-width: 400px;">
+    <div class="card-body">
+        <p><strong>Correo:</strong> @user!.Email</p>
+        <p>
+            <strong>Nombre:</strong>
+            @(perfil?.Nombre ?? "-") @(perfil?.Apellido ?? "")
+        </p>
+        <p><strong>Rol:</strong> @rol</p>
+    </div>
+</div>
+
+<form method="post" asp-action="ConfirmarEliminar"
+      asp-route-userId="@user.Id">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">
+        Si, eliminar
+    </button>
+    <a asp-action="Usuarios" class="btn btn-secondary ms-2">
+        Cancelar
+    </a>
+</form>

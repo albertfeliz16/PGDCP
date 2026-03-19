@@ -1,0 +1,77 @@
+﻿@model PGDCP.Models.PerfilUsuario
+@{
+    ViewData["Title"] = "Editar Usuario";
+    var user = ViewBag.User as Microsoft.AspNetCore.Identity.IdentityUser;
+    var roles = ViewBag.AllRoles as List<string>;
+    var rolAct = ViewBag.RolActual as string;
+}
+
+<h2>Editar Usuario</h2>
+<hr />
+
+<form method="post" asp-action="EditarUsuario" asp-route-userId="@user.Id">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-6">
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Correo electronico</label>
+                <input type="text" class="form-control"
+                       value="@user.Email" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Nombre</label>
+                <input type="text" name="nombre" class="form-control"
+                       value="@Model?.Nombre" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Apellido</label>
+                <input type="text" name="apellido" class="form-control"
+                       value="@Model?.Apellido" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Telefono</label>
+                <input type="tel" name="telefono" class="form-control"
+                       value="@Model?.Telefono" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Fecha de nacimiento</label>
+                <input type="date" name="fechaNacimiento" class="form-control"
+                       value="@Model?.FechaNacimiento.ToString("yyyy-MM-dd")" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Sexo</label>
+                <select name="sexo" class="form-control">
+                    <option value="Masculino"
+                            selected="@(Model?.Sexo == "Masculino")">Masculino</option>
+                    <option value="Femenino"
+                            selected="@(Model?.Sexo == "Femenino")">Femenino</option>
+                    <option value="Prefiero no decirlo"
+                            selected="@(Model?.Sexo == "Prefiero no decirlo")">Prefiero no decirlo</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Rol</label>
+                <select name="rol" class="form-control">
+                    @foreach (var r in roles!)
+                    {
+                        <option value="@r" selected="@(r == rolAct)">@r</option>
+                    }
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Guardar cambios
+            </button>
+            <a asp-action="Usuarios" class="btn btn-secondary ms-2">
+                Cancelar
+            </a>
+        </div>
+    </div>
+</form>
