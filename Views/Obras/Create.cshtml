@@ -1,4 +1,4 @@
-@model Obra
+    @model Obra
 @{ ViewData["Title"] = "Registrar Obra"; }
 
 <div class="page-header">
@@ -11,7 +11,7 @@
         <div class="card fade-in">
             <div class="card-header">Nueva Pieza de Colección</div>
             <div class="card-body">
-                <form asp-action="Create">
+                <form asp-action="Create" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
                     <div class="row g-3">
                         <div class="col-md-8">
@@ -60,8 +60,33 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label asp-for="ImagenUrl" class="form-label">URL de imagen (opcional)</label>
-                                <input asp-for="ImagenUrl" class="form-control" placeholder="https://..." />
+                                <label class="form-label">Imagen de la obra (opcional)</label>
+
+                                <!-- URL externa -->
+                                <input asp-for="ImagenUrl" class="form-control mb-2"
+                                       placeholder="https://... pega una URL de imagen"
+                                       id="imagenUrl" />
+
+                                <!-- Subir desde PC -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="imagenArchivo"
+                                           class="btn btn-outline-light btn-sm"
+                                           style="cursor:pointer;white-space:nowrap;">
+                                        📁 Subir desde PC
+                                    </label>
+                                    <span id="nombreArchivo" style="font-size:.82rem;color:var(--text-muted);">
+                                        Ningún archivo seleccionado
+                                    </span>
+                                    <input type="file" id="imagenArchivo" name="imagenArchivo"
+                                           accept="image/*" style="display:none;" />
+                                </div>
+
+                                <!-- Preview -->
+                                <div id="previewContainer" style="display:none;margin-top:.8rem;">
+                                    <img id="previewImg" src=""
+                                         style="max-height:140px;border-radius:8px;
+                                    border:1px solid rgba(154,123,62,.2);" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -75,4 +100,37 @@
         </div>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Preview cuando se escribe una URL
+        document.getElementById('imagenUrl').addEventListener('input', function () {
+            const url = this.value.trim();
+            if (url) {
+                document.getElementById('previewImg').src = url;
+                document.getElementById('previewContainer').style.display = 'block';
+            } else {
+                document.getElementById('previewContainer').style.display = 'none';
+            }
+        });
+
+        // Preview cuando se sube un archivo desde PC
+        document.getElementById('imagenArchivo').addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            document.getElementById('nombreArchivo').textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewContainer').style.display = 'block';
+                // Limpiar el campo URL si se sube archivo
+                document.getElementById('imagenUrl').value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+}

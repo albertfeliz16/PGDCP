@@ -15,18 +15,20 @@ namespace PGDCP.Controllers
 
         public async Task<IActionResult> Index(string? buscar)
         {
-            var userId  = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isAdmin = User.IsInRole("Administrador");
             var isRestaurador = User.IsInRole("Restaurador");
             var isPerito = User.IsInRole("Perito");
 
-            // Restauradores y Peritos ven todas las obras (solo lectura para Restaurador)
             IQueryable<Obra> query = (isAdmin || isRestaurador || isPerito)
                 ? _context.Obras
                 : _context.Obras.Where(o => o.UserId == userId);
 
             if (!string.IsNullOrEmpty(buscar))
-                query = query.Where(o => o.Titulo.Contains(buscar) || (o.Autor != null && o.Autor.Contains(buscar)) || (o.Epoca != null && o.Epoca.Contains(buscar)));
+                query = query.Where(o =>
+                    o.Titulo.Contains(buscar) ||
+                    (o.Autor != null && o.Autor.Contains(buscar)) ||
+                    (o.Epoca != null && o.Epoca.Contains(buscar)));
 
             ViewBag.Buscar = buscar;
             return View(await query.ToListAsync());
@@ -43,12 +45,54 @@ namespace PGDCP.Controllers
         [Authorize(Roles = "Administrador,Coleccionista")]
         public IActionResult Create() => View();
 
+        // ── CREATE POST ──
         [HttpPost, ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,Coleccionista")]
-        public async Task<IActionResult> Create([Bind("Titulo,Autor,Epoca,Estilo,Material,FechaAdquisicion,ValorEstimado,ImagenUrl")] Obra obra)
+        public async Task<IActionResult> Create(
+            [Bind("Titulo,Autor,Epoca,Estilo,Material,FechaAdquisicion,ValorEstimado,ImagenUrl")] Obra obra,
+            IFormFile? imagenArchivo)
         {
             if (ModelState.IsValid)
             {
+                if (imagenArchivo != null && imagenArchivo.Length > 0)
+                {
+                    try
+                    {
+                        // Validar que sea una imagen
+                        var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                        var extension = Path.GetExtension(imagenArchivo.FileName).ToLower();
+
+                        if (!extensionesPermitidas.Contains(extension))
+                        {
+                            ModelState.AddModelError("", "Solo se permiten imágenes (jpg, png, gif, webp).");
+                            return View(obra);
+                        }
+
+                        // Validar tamaño máximo 5MB
+                        if (imagenArchivo.Length > 5 * 1024 * 1024)
+                        {
+                            ModelState.AddModelError("", "La imagen no puede superar 5MB.");
+                            return View(obra);
+                        }
+
+                        var carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "obras");
+                        Directory.CreateDirectory(carpeta);
+
+                        var nombreArchivo = Guid.NewGuid().ToString() + extension;
+                        var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+                        using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                            await imagenArchivo.CopyToAsync(stream);
+
+                        obra.ImagenUrl = "/images/obras/" + nombreArchivo;
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", $"Error al subir la imagen: {ex.Message}");
+                        return View(obra);
+                    }
+                }
+
                 obra.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _context.Add(obra);
                 await _context.SaveChangesAsync();
@@ -69,16 +113,72 @@ namespace PGDCP.Controllers
             return View(obra);
         }
 
+        // ── EDIT POST ──
         [HttpPost, ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,Coleccionista")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Autor,Epoca,Estilo,Material,FechaAdquisicion,ValorEstimado,ImagenUrl,UserId")] Obra obra)
+        public async Task<IActionResult> Edit(int id,
+            [Bind("Id,Titulo,Autor,Epoca,Estilo,Material,FechaAdquisicion,ValorEstimado,ImagenUrl")] Obra obra,
+            IFormFile? imagenArchivo)
         {
             if (id != obra.Id) return NotFound();
+
             if (ModelState.IsValid)
             {
-                try { _context.Update(obra); await _context.SaveChangesAsync(); }
-                catch (DbUpdateConcurrencyException) { if (!_context.Obras.Any(e => e.Id == obra.Id)) return NotFound(); else throw; }
-                TempData["Success"] = "Obra actualizada correctamente.";
+                if (imagenArchivo != null && imagenArchivo.Length > 0)
+                {
+                    try
+                    {
+                        // Validar que sea una imagen
+                        var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                        var extension = Path.GetExtension(imagenArchivo.FileName).ToLower();
+
+                        if (!extensionesPermitidas.Contains(extension))
+                        {
+                            ModelState.AddModelError("", "Solo se permiten imágenes (jpg, png, gif, webp).");
+                            return View(obra);
+                        }
+
+                        // Validar tamaño máximo 5MB
+                        if (imagenArchivo.Length > 5 * 1024 * 1024)
+                        {
+                            ModelState.AddModelError("", "La imagen no puede superar 5MB.");
+                            return View(obra);
+                        }
+
+                        var carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "obras");
+                        Directory.CreateDirectory(carpeta);
+
+                        var nombreArchivo = Guid.NewGuid().ToString() + extension;
+                        var rutaCompleta = Path.Combine(carpeta, nombreArchivo);
+
+                        using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                            await imagenArchivo.CopyToAsync(stream);
+
+                        obra.ImagenUrl = "/images/obras/" + nombreArchivo;
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", $"Error al subir la imagen: {ex.Message}");
+                        return View(obra);
+                    }
+                }
+
+                try
+                {
+                    // Mantener el UserId original
+                    var obraOriginal = await _context.Obras.AsNoTracking()
+                        .FirstOrDefaultAsync(o => o.Id == id);
+                    obra.UserId = obraOriginal?.UserId;
+
+                    _context.Update(obra);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Obra actualizada correctamente.";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Obras.Any(e => e.Id == obra.Id)) return NotFound();
+                    throw;
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View(obra);

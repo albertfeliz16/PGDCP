@@ -1,9 +1,12 @@
 @model Obra
-@{ ViewData["Title"] = "Editar Obra"; }
+@{
+    ViewData["Title"] = "Editar Obra";
+}
 
 <div class="page-header">
     <h1>Editar Obra</h1>
-    <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-sm" style="color:var(--text-muted);">← Cancelar</a>
+    <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-sm"
+       style="color:var(--text-muted);">← Cancelar</a>
 </div>
 
 <div class="row justify-content-center">
@@ -11,7 +14,7 @@
         <div class="card fade-in">
             <div class="card-header">Editando: @Model?.Titulo</div>
             <div class="card-body">
-                <form asp-action="Edit">
+                <form asp-action="Edit" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
                     <input type="hidden" asp-for="Id" />
                     <div class="row g-3">
@@ -58,16 +61,57 @@
                                 <input asp-for="ValorEstimado" class="form-control" />
                             </div>
                         </div>
+
+                        <!-- Imagen -->
                         <div class="col-12">
                             <div class="form-group">
-                                <label asp-for="ImagenUrl" class="form-label">URL de imagen</label>
-                                <input asp-for="ImagenUrl" class="form-control" />
+                                <label class="form-label">Imagen de la obra (opcional)</label>
+
+                                <!-- URL externa -->
+                                <input asp-for="ImagenUrl" class="form-control mb-2"
+                                       placeholder="https://... pega una URL de imagen"
+                                       id="imagenUrl" />
+
+                                <!-- Subir desde PC -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="imagenArchivo"
+                                           class="btn btn-outline-light btn-sm"
+                                           style="cursor:pointer;white-space:nowrap;">
+                                        📁 Subir desde PC
+                                    </label>
+                                    <span id="nombreArchivo"
+                                          style="font-size:.82rem;color:var(--text-muted);">
+                                        Ningún archivo seleccionado
+                                    </span>
+                                    <input type="file" id="imagenArchivo" name="imagenArchivo"
+                                           accept="image/*" style="display:none;" />
+                                </div>
+
+                                <!-- Preview imagen actual o nueva -->
+                                @if (!string.IsNullOrEmpty(Model?.ImagenUrl))
+                                {
+                                    <div id="previewContainer" style="margin-top:.8rem;">
+                                        <img id="previewImg" src="@Model.ImagenUrl"
+                                             style="max-height:140px;border-radius:8px;
+                                        border:1px solid rgba(154,123,62,.2);" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div id="previewContainer" style="display:none;margin-top:.8rem;">
+                                        <img id="previewImg" src=""
+                                             style="max-height:140px;border-radius:8px;
+                                        border:1px solid rgba(154,123,62,.2);" />
+                                    </div>
+                                }
                             </div>
                         </div>
+
                     </div>
                     <hr class="divider">
                     <div class="d-flex gap-2 justify-content-end">
-                        <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-outline-light">Cancelar</a>
+                        <a asp-action="Details" asp-route-id="@Model?.Id"
+                           class="btn btn-outline-light">Cancelar</a>
                         <button type="submit" class="btn btn-primary">Guardar cambios</button>
                     </div>
                 </form>
@@ -75,4 +119,36 @@
         </div>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Preview cuando se escribe una URL
+        document.getElementById('imagenUrl').addEventListener('input', function () {
+            const url = this.value.trim();
+            if (url) {
+                document.getElementById('previewImg').src = url;
+                document.getElementById('previewContainer').style.display = 'block';
+            } else {
+                document.getElementById('previewContainer').style.display = 'none';
+            }
+        });
+
+        // Preview cuando se sube un archivo desde PC
+        document.getElementById('imagenArchivo').addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            document.getElementById('nombreArchivo').textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewContainer').style.display = 'block';
+                // Limpiar URL si se sube archivo
+                document.getElementById('imagenUrl').value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+}
