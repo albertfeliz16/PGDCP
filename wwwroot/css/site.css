@@ -133,6 +133,7 @@ h4 {
         background: var(--gold);
         opacity: .85;
         clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+        flex-shrink: 0;
     }
 
 .nav-link {
@@ -174,7 +175,6 @@ h4 {
     filter: invert(.3) sepia(.6) saturate(2) hue-rotate(10deg);
 }
 
-/* Role badge in navbar */
 .role-pill {
     font-size: .62rem;
     letter-spacing: .12em;
@@ -184,6 +184,7 @@ h4 {
     font-family: var(--fb);
     border: 1px solid;
     line-height: 1.4;
+    white-space: nowrap;
 }
 
 .role-admin {
@@ -246,11 +247,12 @@ main {
             height: 2rem;
             background: linear-gradient(to bottom, var(--gold), transparent);
             border-radius: 2px;
+            flex-shrink: 0;
         }
 
 /* ── CARDS ── */
 .card {
-    background: #FFFFFF;
+    background: #FFF;
     border: 1px solid rgba(154,123,62,.16);
     border-radius: var(--rl);
     box-shadow: var(--sh-sm);
@@ -278,10 +280,10 @@ main {
 
 /* ── TABLES ── */
 .table-wrapper {
-    background: #FFFFFF;
+    background: #FFF;
     border: 1px solid rgba(154,123,62,.16);
     border-radius: var(--rl);
-    overflow: hidden;
+    overflow-x: auto;
     box-shadow: var(--sh-sm);
 }
 
@@ -291,6 +293,7 @@ main {
     border-collapse: separate;
     border-spacing: 0;
     width: 100%;
+    min-width: 500px;
 }
 
     .table thead tr {
@@ -350,19 +353,20 @@ main {
     display: inline-flex;
     align-items: center;
     gap: .45rem;
+    white-space: nowrap;
 }
 
 .btn-primary, .btn-gold {
     background: var(--gold);
     border-color: var(--gold);
-    color: #FFFFFF !important;
+    color: #FFF !important;
     font-weight: 500;
 }
 
     .btn-primary:hover, .btn-gold:hover {
         background: var(--gold-light);
         border-color: var(--gold-light);
-        color: #FFFFFF !important;
+        color: #FFF !important;
         box-shadow: 0 4px 16px rgba(154,123,62,.25);
         transform: translateY(-1px);
     }
@@ -484,7 +488,7 @@ main {
     }
 
     .form-control:focus, .form-select:focus {
-        background: #FFFFFF;
+        background: #FFF;
         border-color: var(--gold);
         box-shadow: 0 0 0 3px rgba(154,123,62,.1);
         outline: none;
@@ -522,6 +526,18 @@ textarea.form-control {
         padding: 0;
         margin: 0;
     }
+
+.form-floating > .form-control {
+    background: var(--cream-mid);
+}
+
+.form-floating > label {
+    color: var(--text-muted);
+}
+
+.form-floating > .form-control:focus {
+    background: #FFF;
+}
 
 /* ── BADGES ── */
 .badge {
@@ -562,12 +578,6 @@ textarea.form-control {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.4rem 2rem;
-}
-
-@media (max-width: 600px) {
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 .detail-label {
@@ -615,13 +625,13 @@ textarea.form-control {
 /* ── STAT CARDS ── */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1.2rem;
     margin-bottom: 2.2rem;
 }
 
 .stat-card {
-    background: #FFFFFF;
+    background: #FFF;
     border: 1px solid rgba(154,123,62,.15);
     border-radius: var(--rl);
     padding: 1.4rem;
@@ -693,7 +703,7 @@ textarea.form-control {
 }
 
 .hero h1 {
-    font-size: clamp(2.5rem, 6vw, 4.4rem);
+    font-size: clamp(2rem, 6vw, 4.4rem);
     margin-bottom: 1.1rem;
 }
 
@@ -741,6 +751,7 @@ textarea.form-control {
 .search-bar {
     position: relative;
     max-width: 380px;
+    width: 100%;
 }
 
     .search-bar input {
@@ -764,7 +775,7 @@ textarea.form-control {
             border-color: var(--gold);
             outline: none;
             box-shadow: 0 0 0 3px rgba(154,123,62,.1);
-            background: #FFFFFF;
+            background: #FFF;
         }
 
     .search-bar .search-icon {
@@ -867,19 +878,6 @@ textarea.form-control {
         opacity: .4;
     }
 
-/* ── FORM FLOATING OVERRIDE (Identity pages) ── */
-.form-floating > .form-control {
-    background: var(--cream-mid);
-}
-
-.form-floating > label {
-    color: var(--text-muted);
-}
-
-.form-floating > .form-control:focus {
-    background: #FFFFFF;
-}
-
 /* ── ANIMATIONS ── */
 @keyframes fadeIn {
     from {
@@ -923,32 +921,175 @@ textarea.form-control {
     }
 
 /* ── RESPONSIVE ── */
-@media (max-width:768px) {
-    h1 {
+@media (max-width: 1200px) {
+    .container {
+        max-width: 100% !important;
+        padding: 0 1.2rem !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        padding: 0 1rem !important;
+    }
+
+    .nav-link {
+        font-size: .68rem !important;
+        padding: .4rem .5rem !important;
+        letter-spacing: .06em !important;
+    }
+
+    .role-pill {
+        font-size: .52rem;
+        padding: .12em .4em;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: .8rem;
+    }
+
+    .stat-value {
         font-size: 2rem;
+    }
+
+    .stat-card {
+        padding: 1.1rem;
+    }
+
+    main {
+        padding: 1.8rem 0 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.2rem !important;
+    }
+
+    .container {
+        padding: 0 .8rem !important;
     }
 
     .stats-grid {
         grid-template-columns: 1fr 1fr;
+        gap: .7rem;
     }
 
-    .table-wrapper {
-        overflow-x: auto;
+    .stat-value {
+        font-size: 1.7rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
     }
 
     .page-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: .6rem;
+        margin-bottom: 1.2rem;
     }
+
+        .page-header h1 {
+            font-size: 1.5rem !important;
+        }
 
     .toolbar {
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table td, .table thead th {
+        padding: .6rem .8rem;
+        font-size: .8rem;
+    }
+
+    .hero {
+        padding: 2.5rem 1rem 2rem;
+    }
+
+    .hero-sub {
+        font-size: .88rem;
+        padding: 0 .5rem;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .d-flex.gap-2, .d-flex.gap-3 {
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        font-size: .72rem;
+        padding: .4rem .9rem;
+    }
+
+    main {
+        padding: 1.5rem 0 2.5rem;
+    }
 }
 
-@media (max-width:480px) {
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
     .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .row.g-3 > [class*="col-"] {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .hero h1 {
+        font-size: 1.6rem !important;
+    }
+
+    .card-body {
+        padding: .8rem;
+    }
+
+    .table td, .table thead th {
+        padding: .5rem .6rem;
+        font-size: .75rem;
+    }
+
+    .btn-sm {
+        font-size: .65rem;
+        padding: .25rem .55rem;
+    }
+
+    .role-callout {
+        font-size: .78rem;
+        padding: .6rem .8rem;
+    }
+
+    .page-header h1::before {
+        display: none;
+    }
+
+    .detail-grid {
         grid-template-columns: 1fr;
     }
 }

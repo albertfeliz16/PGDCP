@@ -2,6 +2,13 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
+@{
+    var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
+    var enLoginORegistro = currentPath.Contains("/login") ||
+                           currentPath.Contains("/register") ||
+                           currentPath.Contains("/account");
+}
+
 <ul class="navbar-nav align-items-center gap-2">
     @if (SignInManager.IsSignedIn(User))
     {
@@ -35,7 +42,7 @@
             </form>
         </li>
     }
-    else
+    else if (!enLoginORegistro)
     {
         <li class="nav-item">
             <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Registrarse</a>

@@ -1,5 +1,7 @@
 @model PGDCP.Models.Valoracion
-@{ ViewData["Title"] = "Nueva Valoración"; }
+@{
+    ViewData["Title"] = "Nueva Valoración";
+}
 
 <div class="page-header">
     <h1>Nueva Valoración Pericial</h1>
@@ -13,6 +15,10 @@
             <div class="card-body">
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+                    <!-- Fecha oculta, se asigna automáticamente en el servidor -->
+                    <input type="hidden" asp-for="FechaValoracion" />
+
                     <div class="row g-3">
                         <div class="col-md-8">
                             <div class="form-group">
@@ -23,13 +29,17 @@
                                 <span asp-validation-for="ObraId" class="field-validation-error"></span>
                             </div>
                         </div>
+
+                        <!-- Fecha visible pero no editable -->
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="FechaValoracion" class="form-label">Fecha *</label>
-                                <input asp-for="FechaValoracion" class="form-control" type="date" />
-                                <span asp-validation-for="FechaValoracion" class="field-validation-error"></span>
+                                <label class="form-label">Fecha</label>
+                                <input type="text" class="form-control"
+                                       value="@DateTime.Today.ToString("dd/MM/yyyy")"
+                                       disabled />
                             </div>
                         </div>
+
                         <div class="col-12">
                             <div class="form-group">
                                 <label asp-for="ValorEstimado" class="form-label">Valor Determinado (USD) *</label>
@@ -40,11 +50,15 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label asp-for="Observaciones" class="form-label">Observaciones y notas técnicas</label>
-                                <textarea asp-for="Observaciones" class="form-control" rows="4" placeholder="Contexto del peritaje, metodología empleada, notas adicionales..."></textarea>
+                                <textarea asp-for="Observaciones" class="form-control" rows="4"
+                                          placeholder="Contexto del peritaje, metodología empleada, notas adicionales..."></textarea>
                             </div>
                         </div>
                     </div>
-                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:.5rem;">El perito quedará registrado automáticamente con tu usuario.</p>
+
+                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:.5rem;">
+                        El perito quedará registrado automáticamente con tu usuario.
+                    </p>
                     <hr class="divider">
                     <div class="d-flex gap-2 justify-content-end">
                         <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
@@ -55,4 +69,10 @@
         </div>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PGDCP.Data;
+using PGDCP.Models;
 
 namespace PGDCP.Controllers
 {
@@ -17,7 +18,9 @@ namespace PGDCP.Controllers
         {
             var query = _context.Conservaciones.Include(c => c.Obra).AsQueryable();
             if (!string.IsNullOrEmpty(buscar))
-                query = query.Where(c => c.Diagnostico.Contains(buscar) || (c.Tratamiento != null && c.Tratamiento.Contains(buscar)));
+                query = query.Where(c =>
+                    c.Diagnostico.Contains(buscar) ||
+                    (c.Tratamiento != null && c.Tratamiento.Contains(buscar)));
             ViewBag.Buscar = buscar;
             return View(await query.OrderByDescending(c => c.FechaIntervencion).ToListAsync());
         }
@@ -36,12 +39,18 @@ namespace PGDCP.Controllers
             return View();
         }
 
+        // ── CREATE POST — fecha automática ──
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ObraId,Diagnostico,Tratamiento,FechaIntervencion")] Conservacion conservacion)
+        public async Task<IActionResult> Create(
+            [Bind("ObraId,Diagnostico,Tratamiento")] Conservacion conservacion)
         {
             if (ModelState.IsValid)
             {
+                // Fecha de hoy automáticamente
+                conservacion.FechaIntervencion = DateTime.Today;
+                // Restaurador registrado automáticamente
                 conservacion.RestauradorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
                 _context.Add(conservacion);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Registro de conservación guardado.";
@@ -61,13 +70,22 @@ namespace PGDCP.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ObraId,Diagnostico,Tratamiento,FechaIntervencion,RestauradorId")] Conservacion conservacion)
+        public async Task<IActionResult> Edit(int id,
+            [Bind("Id,ObraId,Diagnostico,Tratamiento,FechaIntervencion,RestauradorId")] Conservacion conservacion)
         {
             if (id != conservacion.Id) return NotFound();
             if (ModelState.IsValid)
             {
-                try { _context.Update(conservacion); await _context.SaveChangesAsync(); }
-                catch (DbUpdateConcurrencyException) { if (!_context.Conservaciones.Any(e => e.Id == conservacion.Id)) return NotFound(); else throw; }
+                try
+                {
+                    _context.Update(conservacion);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Conservaciones.Any(e => e.Id == conservacion.Id)) return NotFound();
+                    else throw;
+                }
                 TempData["Success"] = "Registro actualizado.";
                 return RedirectToAction(nameof(Index));
             }

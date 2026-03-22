@@ -31,6 +31,7 @@ namespace PGDCP.Controllers
 
             return perfil.Rol switch
             {
+                "Administrador" => View("PerfilAdministrador", perfil),
                 "Coleccionista" => View("PerfilColeccionista", perfil),
                 "Perito" => View("PerfilPerito", perfil),
                 "Restaurador" => View("PerfilRestaurador", perfil),
