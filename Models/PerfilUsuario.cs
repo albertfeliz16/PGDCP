@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 namespace PGDCP.Models
 {
-    // Validación personalizada para verificar que el usuario sea mayor de edad
+    // Validación personalizada para verificar que el usuario sea mayor de edad.
     public class MayorDeEdadAttribute : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
