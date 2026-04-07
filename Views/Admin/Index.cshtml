@@ -18,6 +18,38 @@
 <hr class="divider">
 
 <div class="page-header" style="margin-bottom:1rem;">
+    <h2 style="font-size:1.5rem;">Catálogos</h2>
+</div>
+<div class="row g-3 stagger" style="max-width:900px;">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Categorías y Estilos</div>
+            <div class="card-body d-flex flex-column gap-2">
+                <a asp-controller="Catalogos" asp-action="Categorias" class="btn btn-outline-light btn-sm w-100">Gestionar categorías</a>
+                <a asp-controller="Catalogos" asp-action="Estilos" class="btn btn-outline-light btn-sm w-100">Gestionar estilos</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Épocas y Materiales</div>
+            <div class="card-body d-flex flex-column gap-2">
+                <a asp-controller="Catalogos" asp-action="Epocas" class="btn btn-outline-light btn-sm w-100">Gestionar épocas</a>
+                <a asp-controller="Catalogos" asp-action="Materiales" class="btn btn-outline-light btn-sm w-100">Gestionar materiales</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Ubicaciones</div>
+            <div class="card-body d-flex flex-column gap-2">
+                <a asp-controller="Catalogos" asp-action="Ubicaciones" class="btn btn-outline-light btn-sm w-100">Gestionar ubicaciones</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-header" style="margin-bottom:1rem;">
     <h2 style="font-size:1.5rem;">Gestión de módulos</h2>
 </div>
 <div class="row g-3 stagger" style="max-width:900px;">
