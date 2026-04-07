@@ -7,7 +7,7 @@ using PGDCP.Models;
 
 namespace PGDCP.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize] // Cualquier usuario autenticado puede ver y crear
     public class CatalogosController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,14 +23,22 @@ namespace PGDCP.Controllers
         {
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                _context.Categorias.Add(new Categoria { Nombre = nombre, Descripcion = descripcion });
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Categoría creada.";
+                var existe = await _context.Categorias
+                    .AnyAsync(c => c.Nombre.ToLower() == nombre.ToLower().Trim());
+                if (existe)
+                    TempData["Error"] = $"Ya existe una categoría llamada '{nombre}'.";
+                else
+                {
+                    _context.Categorias.Add(new Categoria { Nombre = nombre.Trim(), Descripcion = descripcion });
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Categoría creada.";
+                }
             }
             return RedirectToAction(nameof(Categorias));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")] // Solo admin puede eliminar
         public async Task<IActionResult> EliminarCategoria(int id)
         {
             var item = await _context.Categorias.FindAsync(id);
@@ -48,14 +56,22 @@ namespace PGDCP.Controllers
         {
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                _context.Epocas.Add(new Epoca { Nombre = nombre, Descripcion = descripcion, SigloDesde = sigloDesde, SigloHasta = sigloHasta });
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Época creada.";
+                var existe = await _context.Epocas
+                    .AnyAsync(e => e.Nombre.ToLower() == nombre.ToLower().Trim());
+                if (existe)
+                    TempData["Error"] = $"Ya existe una época llamada '{nombre}'.";
+                else
+                {
+                    _context.Epocas.Add(new Epoca { Nombre = nombre.Trim(), Descripcion = descripcion, SigloDesde = sigloDesde, SigloHasta = sigloHasta });
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Época creada.";
+                }
             }
             return RedirectToAction(nameof(Epocas));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> EliminarEpoca(int id)
         {
             var item = await _context.Epocas.FindAsync(id);
@@ -73,14 +89,22 @@ namespace PGDCP.Controllers
         {
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                _context.Estilos.Add(new Estilo { Nombre = nombre, Descripcion = descripcion });
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Estilo creado.";
+                var existe = await _context.Estilos
+                    .AnyAsync(e => e.Nombre.ToLower() == nombre.ToLower().Trim());
+                if (existe)
+                    TempData["Error"] = $"Ya existe un estilo llamado '{nombre}'.";
+                else
+                {
+                    _context.Estilos.Add(new Estilo { Nombre = nombre.Trim(), Descripcion = descripcion });
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Estilo creado.";
+                }
             }
             return RedirectToAction(nameof(Estilos));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> EliminarEstilo(int id)
         {
             var item = await _context.Estilos.FindAsync(id);
@@ -98,14 +122,22 @@ namespace PGDCP.Controllers
         {
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                _context.Ubicaciones.Add(new Ubicacion { Nombre = nombre, Descripcion = descripcion, Direccion = direccion });
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Ubicación creada.";
+                var existe = await _context.Ubicaciones
+                    .AnyAsync(u => u.Nombre.ToLower() == nombre.ToLower().Trim());
+                if (existe)
+                    TempData["Error"] = $"Ya existe una ubicación llamada '{nombre}'.";
+                else
+                {
+                    _context.Ubicaciones.Add(new Ubicacion { Nombre = nombre.Trim(), Descripcion = descripcion, Direccion = direccion });
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Ubicación creada.";
+                }
             }
             return RedirectToAction(nameof(Ubicaciones));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> EliminarUbicacion(int id)
         {
             var item = await _context.Ubicaciones.FindAsync(id);
@@ -123,14 +155,22 @@ namespace PGDCP.Controllers
         {
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                _context.Materiales.Add(new Material { Nombre = nombre, Descripcion = descripcion });
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Material creado.";
+                var existe = await _context.Materiales
+                    .AnyAsync(m => m.Nombre.ToLower() == nombre.ToLower().Trim());
+                if (existe)
+                    TempData["Error"] = $"Ya existe un material llamado '{nombre}'.";
+                else
+                {
+                    _context.Materiales.Add(new Material { Nombre = nombre.Trim(), Descripcion = descripcion });
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Material creado.";
+                }
             }
             return RedirectToAction(nameof(Materiales));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> EliminarMaterial(int id)
         {
             var item = await _context.Materiales.FindAsync(id);

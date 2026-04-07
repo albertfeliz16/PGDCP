@@ -12,6 +12,10 @@
 {
     <div class="alert alert-success mb-3">✓ @TempData["Success"]</div>
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mb-3">⚠ @TempData["Error"]</div>
+}
 
 <div class="row g-4">
     <div class="col-lg-4">
@@ -55,11 +59,14 @@
                                 <td style="color:var(--text-muted);font-size:.85rem;">@(item.Direccion ?? "—")</td>
                                 <td style="color:var(--text-muted);font-size:.85rem;">@(item.Descripcion ?? "—")</td>
                                 <td>
-                                    <form asp-action="EliminarUbicacion" method="post" onsubmit="return confirm('¿Eliminar @item.Nombre?')">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                    </form>
+                                    @if (User.IsInRole("Administrador"))
+                                    {
+                                        <form asp-action="EliminarUbicacion" method="post" onsubmit="return confirm('¿Eliminar @item.Nombre?')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                        </form>
+                                    }
                                 </td>
                             </tr>
                         }
