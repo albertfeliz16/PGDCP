@@ -31,6 +31,18 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Obras" asp-action="Index">Obras</a>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    Catálogos
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Categorias">Categorías</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Epocas">Épocas</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Estilos">Estilos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Ubicaciones">Ubicaciones</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Materiales">Materiales</a></li>
+                                </ul>
+                            </li>
                         }
                         @if (User.IsInRole("Administrador") || User.IsInRole("Restaurador"))
                         {
