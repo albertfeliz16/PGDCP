@@ -1,19 +1,23 @@
-    @model Obra
-@{ ViewData["Title"] = "Registrar Obra"; }
+@model PGDCP.Models.Obra
+@{
+    ViewData["Title"] = "Nueva Obra";
+}
 
 <div class="page-header">
-    <h1>Registrar Obra</h1>
+    <h1>Registrar Nueva Obra</h1>
     <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Volver</a>
 </div>
 
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card fade-in">
-            <div class="card-header">Nueva Pieza de Colección</div>
+            <div class="card-header">Datos de la obra</div>
             <div class="card-body">
                 <form asp-action="Create" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
                     <div class="row g-3">
+
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label asp-for="Titulo" class="form-label">Título *</label>
@@ -21,75 +25,92 @@
                                 <span asp-validation-for="Titulo" class="field-validation-error"></span>
                             </div>
                         </div>
+
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="Autor" class="form-label">Autor</label>
                                 <input asp-for="Autor" class="form-control" placeholder="Nombre del autor" />
                             </div>
                         </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label asp-for="Epoca" class="form-label">Época</label>
-                                <input asp-for="Epoca" class="form-control" placeholder="ej. Siglo XIX" />
+                                <label asp-for="CategoriaId" class="form-label">Categoría</label>
+                                <select asp-for="CategoriaId" class="form-select"
+                                        asp-items="ViewBag.CategoriaId">
+                                    <option value="">— Seleccione —</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label asp-for="Estilo" class="form-label">Estilo</label>
-                                <input asp-for="Estilo" class="form-control" placeholder="ej. Barroco" />
+                                <label asp-for="EpocaId" class="form-label">Época</label>
+                                <select asp-for="EpocaId" class="form-select"
+                                        asp-items="ViewBag.EpocaId">
+                                    <option value="">— Seleccione —</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label asp-for="Material" class="form-label">Material</label>
-                                <input asp-for="Material" class="form-control" placeholder="ej. Óleo sobre lienzo" />
+                                <label asp-for="EstiloId" class="form-label">Estilo</label>
+                                <select asp-for="EstiloId" class="form-select"
+                                        asp-items="ViewBag.EstiloId">
+                                    <option value="">— Seleccione —</option>
+                                </select>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="UbicacionId" class="form-label">Ubicación</label>
+                                <select asp-for="UbicacionId" class="form-select"
+                                        asp-items="ViewBag.UbicacionId">
+                                    <option value="">— Seleccione —</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="FechaAdquisicion" class="form-label">Fecha de Adquisición</label>
                                 <input asp-for="FechaAdquisicion" class="form-control" type="date" />
+                                <span asp-validation-for="FechaAdquisicion" class="field-validation-error"></span>
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="ValorEstimado" class="form-label">Valor Estimado (USD)</label>
-                                <input asp-for="ValorEstimado" class="form-control" placeholder="0.00" />
+                                <input asp-for="ValorEstimado" class="form-control" type="number"
+                                       step="0.01" min="0" placeholder="0.00" />
                                 <span asp-validation-for="ValorEstimado" class="field-validation-error"></span>
                             </div>
                         </div>
+
                         <div class="col-12">
                             <div class="form-group">
-                                <label class="form-label">Imagen de la obra (opcional)</label>
-
-                                <!-- URL externa -->
-                                <input asp-for="ImagenUrl" class="form-control mb-2"
-                                       placeholder="https://... pega una URL de imagen"
-                                       id="imagenUrl" />
-
-                                <!-- Subir desde PC -->
-                                <div class="d-flex align-items-center gap-2">
-                                    <label for="imagenArchivo"
-                                           class="btn btn-outline-light btn-sm"
-                                           style="cursor:pointer;white-space:nowrap;">
-                                        📁 Subir desde PC
-                                    </label>
-                                    <span id="nombreArchivo" style="font-size:.82rem;color:var(--text-muted);">
-                                        Ningún archivo seleccionado
-                                    </span>
-                                    <input type="file" id="imagenArchivo" name="imagenArchivo"
-                                           accept="image/*" style="display:none;" />
-                                </div>
-
-                                <!-- Preview -->
-                                <div id="previewContainer" style="display:none;margin-top:.8rem;">
-                                    <img id="previewImg" src=""
-                                         style="max-height:140px;border-radius:8px;
-                                    border:1px solid rgba(154,123,62,.2);" />
-                                </div>
+                                <label asp-for="Descripcion" class="form-label">Descripción</label>
+                                <textarea asp-for="Descripcion" class="form-control" rows="3"
+                                          placeholder="Descripción general de la obra..."></textarea>
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Imagen</label>
+                                <input type="file" name="imagenArchivo" class="form-control"
+                                       accept=".jpg,.jpeg,.png,.gif,.webp" />
+                                <small style="color:var(--text-muted);">
+                                    Formatos: jpg, png, gif, webp. Máximo 5MB.
+                                </small>
+                            </div>
+                        </div>
+
                     </div>
+
                     <hr class="divider">
                     <div class="d-flex gap-2 justify-content-end">
                         <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
@@ -100,37 +121,9 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        // Preview cuando se escribe una URL
-        document.getElementById('imagenUrl').addEventListener('input', function () {
-            const url = this.value.trim();
-            if (url) {
-                document.getElementById('previewImg').src = url;
-                document.getElementById('previewContainer').style.display = 'block';
-            } else {
-                document.getElementById('previewContainer').style.display = 'none';
-            }
-        });
-
-        // Preview cuando se sube un archivo desde PC
-        document.getElementById('imagenArchivo').addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-
-            document.getElementById('nombreArchivo').textContent = file.name;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById('previewImg').src = e.target.result;
-                document.getElementById('previewContainer').style.display = 'block';
-                // Limpiar el campo URL si se sube archivo
-                document.getElementById('imagenUrl').value = '';
-            };
-            reader.readAsDataURL(file);
-        });
-    </script>
 }

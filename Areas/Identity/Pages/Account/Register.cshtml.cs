@@ -28,7 +28,7 @@ namespace PGDCP.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly ApplicationDbContext _context; // Para guardar el perfil
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -36,7 +36,7 @@ namespace PGDCP.Areas.Identity.Pages.Account
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            ApplicationDbContext context) // Inyectamos el DbContext
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -56,68 +56,57 @@ namespace PGDCP.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            // Correo electrónico
             [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
             [EmailAddress(ErrorMessage = "El formato del correo no es válido.")]
             [Display(Name = "Correo electrónico")]
             public string Email { get; set; }
 
-            // Nombre
             [Required(ErrorMessage = "El nombre es obligatorio.")]
             [StringLength(50)]
             [Display(Name = "Nombre")]
             public string Nombre { get; set; }
 
-            // Apellido
             [Required(ErrorMessage = "El apellido es obligatorio.")]
             [StringLength(50)]
             [Display(Name = "Apellido")]
             public string Apellido { get; set; }
 
-            // Fecha de nacimiento
             [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
             [DataType(DataType.Date)]
             [MayorDeEdad]
             [Display(Name = "Fecha de nacimiento")]
             public DateTime FechaNacimiento { get; set; }
 
-            // Sexo
             [Required(ErrorMessage = "El sexo es obligatorio.")]
             [Display(Name = "Sexo")]
             public string Sexo { get; set; }
 
-            // Teléfono
             [Phone(ErrorMessage = "Formato de teléfono no válido.")]
             [Display(Name = "Teléfono")]
             public string Telefono { get; set; }
 
-            // Rol
             [Required(ErrorMessage = "El rol es obligatorio.")]
             [Display(Name = "Rol")]
             public string Rol { get; set; }
 
-            // Contraseña
             [Required(ErrorMessage = "La contraseña es obligatoria.")]
             [StringLength(100, ErrorMessage = "La {0} debe tener al menos {2} y máximo {1} caracteres.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Contraseña")]
             public string Password { get; set; }
 
-            // Confirmar contraseña
             [DataType(DataType.Password)]
             [Display(Name = "Confirmar contraseña")]
             [Compare("Password", ErrorMessage = "Las contraseñas no coinciden.")]
             public string ConfirmPassword { get; set; }
         }
 
-        // Cargar la página de registro
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        // Procesar el formulario de registro
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -125,7 +114,6 @@ namespace PGDCP.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // Crear el usuario de Identity (solo email y contraseña)
                 var user = CreateUser();
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -135,7 +123,7 @@ namespace PGDCP.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("Se registró un nuevo usuario.");
 
-                    // Guardar el perfil extra en la tabla PerfilesUsuario
+                    // Perfil sin campo Rol — el rol vive solo en Identity
                     var perfil = new PerfilUsuario
                     {
                         UserId = await _userManager.GetUserIdAsync(user),
@@ -143,14 +131,14 @@ namespace PGDCP.Areas.Identity.Pages.Account
                         Apellido = Input.Apellido,
                         FechaNacimiento = Input.FechaNacimiento,
                         Sexo = Input.Sexo,
-                        Telefono = Input.Telefono,
-                        Rol = Input.Rol
+                        Telefono = Input.Telefono
                     };
                     _context.PerfilesUsuario.Add(perfil);
                     await _context.SaveChangesAsync();
+
+                    // Rol asignado en Identity
                     await _userManager.AddToRoleAsync(user, Input.Rol);
 
-                    // Generar confirmación de correo
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -169,13 +157,11 @@ namespace PGDCP.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        // Iniciar sesión automáticamente
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return Redirect("/Perfil");
                     }
                 }
 
-                // Mostrar errores de Identity
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -200,9 +186,7 @@ namespace PGDCP.Areas.Identity.Pages.Account
         private IUserEmailStore<IdentityUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
-            {
                 throw new NotSupportedException("Se requiere un store con soporte de correo electrónico.");
-            }
             return (IUserEmailStore<IdentityUser>)_userStore;
         }
     }

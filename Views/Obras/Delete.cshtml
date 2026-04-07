@@ -1,31 +1,50 @@
-@model Obra
-@{ ViewData["Title"] = "Eliminar Obra"; }
+@model PGDCP.Models.Obra
+@{
+    ViewData["Title"] = "Eliminar Obra";
+}
 
-<div class="page-header"><h1>Confirmar eliminación</h1></div>
+<div class="page-header">
+    <h1>Eliminar Obra</h1>
+    <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Volver</a>
+</div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-5">
-        <div class="card fade-in" style="border-color:rgba(166,61,47,.3);">
-            <div class="card-header" style="background:rgba(166,61,47,.08);border-color:rgba(166,61,47,.25);color:#fca5a5;">
-                ¿Eliminar esta obra permanentemente?
+    <div class="col-lg-6">
+        <div class="card fade-in" style="border:1px solid var(--rose);">
+            <div class="card-header" style="color:var(--rose);">
+                ⚠ Confirmar eliminación
             </div>
             <div class="card-body">
-                <div class="detail-grid" style="grid-template-columns:1fr;">
-                    <div><div class="detail-label">Título</div><div class="detail-value">@Model?.Titulo</div></div>
-                    <div><div class="detail-label">Autor</div><div class="detail-value">@Model?.Autor</div></div>
-                    <div>
-                        <div class="detail-label">Valor Estimado</div>
-                        <div class="detail-value" style="color:var(--gold-light);">$@Model?.ValorEstimado.ToString("N2")</div>
-                    </div>
-                </div>
+                <p style="color:var(--text-muted);">
+                    Esta acción es <strong style="color:var(--ivory);">permanente</strong>
+                    y eliminará también todas las imágenes asociadas a esta obra.
+                </p>
+                <dl class="row mt-3">
+                    <dt class="col-sm-4" style="color:var(--text-muted);">Título</dt>
+                    <dd class="col-sm-8" style="font-family:var(--fd);color:var(--ivory);">
+                        @Model.Titulo
+                    </dd>
+
+                    <dt class="col-sm-4" style="color:var(--text-muted);">Autor</dt>
+                    <dd class="col-sm-8">@(Model.Autor ?? "—")</dd>
+
+                    <dt class="col-sm-4" style="color:var(--text-muted);">Categoría</dt>
+                    <dd class="col-sm-8">@(Model.Categoria?.Nombre ?? "—")</dd>
+
+                    <dt class="col-sm-4" style="color:var(--text-muted);">Época</dt>
+                    <dd class="col-sm-8">@(Model.Epoca?.Nombre ?? "—")</dd>
+
+                    <dt class="col-sm-4" style="color:var(--text-muted);">Valor estimado</dt>
+                    <dd class="col-sm-8" style="color:var(--gold-light);">
+                        $@Model.ValorEstimado.ToString("N0") USD
+                    </dd>
+                </dl>
+
                 <hr class="divider">
-                <p style="color:var(--text-muted);font-size:.83rem;">Esta acción no se puede deshacer. Se eliminarán todos los datos de esta obra.</p>
-                <form asp-action="Delete">
-                    <input type="hidden" asp-for="Id" />
-                    <div class="d-flex gap-2 justify-content-end mt-3">
-                        <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
-                        <button type="submit" class="btn btn-danger">Eliminar definitivamente</button>
-                    </div>
+                <form asp-action="Delete" method="post" class="d-flex gap-2 justify-content-end">
+                    @Html.AntiForgeryToken()
+                    <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
+                    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
                 </form>
             </div>
         </div>

@@ -6,8 +6,6 @@
 
 @if (!User.Identity?.IsAuthenticated ?? true)
 {
-    @* ─── HERO PÚBLICO ─── *@
-    @* ─── HERO PÚBLICO ─── *@
     <section class="hero">
         <span class="hero-eyebrow">Patrimonio Cultural Privado</span>
         <h1>Gestión <em>Digital</em><br>de Colecciones</h1>
@@ -23,7 +21,6 @@
 }
 else if (User.IsInRole("Administrador"))
 {
-    @* ─── DASHBOARD ADMINISTRADOR ─── *@
     <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <h1 style="margin:0;">Panel <em style="color:var(--gold-light);">Administrador</em></h1>
         <span class="badge badge-gold">Control total del sistema</span>
@@ -93,7 +90,7 @@ else if (User.IsInRole("Administrador"))
                         <tr>
                             <td><span style="font-family:var(--fd);color:var(--ivory);">@obra.Titulo</span></td>
                             <td>@obra.Autor</td>
-                            <td><span class="badge badge-teal">@obra.Epoca</span></td>
+                            <td><span class="badge badge-teal">@obra.Epoca?.Nombre</span></td>
                             <td><span style="color:var(--gold-light);font-family:var(--fd);">$@obra.ValorEstimado.ToString("N0")</span></td>
                             <td><a class="action-link" asp-controller="Obras" asp-action="Details" asp-route-id="@obra.Id">Ver →</a></td>
                         </tr>
@@ -105,7 +102,6 @@ else if (User.IsInRole("Administrador"))
 }
 else if (User.IsInRole("Restaurador"))
 {
-    @* ─── DASHBOARD RESTAURADOR ─── *@
     <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <h1 style="margin:0;">Panel <em style="color:var(--gold-light);">Restaurador</em></h1>
         <span class="badge badge-teal">Conservación y restauración</span>
@@ -165,7 +161,6 @@ else if (User.IsInRole("Restaurador"))
 }
 else if (User.IsInRole("Perito"))
 {
-    @* ─── DASHBOARD PERITO ─── *@
     <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <h1 style="margin:0;">Panel <em style="color:var(--gold-light);">Perito</em></h1>
         <span class="badge badge-purple">Valoraciones periciales</span>
@@ -225,7 +220,6 @@ else if (User.IsInRole("Perito"))
 }
 else
 {
-    @* ─── DASHBOARD COLECCIONISTA ─── *@
     <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <h1 style="margin:0;">Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1>
         <span class="badge badge-rose">Coleccionista</span>
@@ -251,7 +245,7 @@ else
                         <tr>
                             <td><span style="font-family:var(--fd);color:var(--ivory);">@obra.Titulo</span></td>
                             <td>@obra.Autor</td>
-                            <td><span class="badge badge-teal">@obra.Epoca</span></td>
+                            <td><span class="badge badge-teal">@obra.Epoca?.Nombre</span></td>
                             <td><span style="color:var(--gold-light);font-family:var(--fd);">$@obra.ValorEstimado.ToString("N0")</span></td>
                             <td>
                                 <div class="action-links">

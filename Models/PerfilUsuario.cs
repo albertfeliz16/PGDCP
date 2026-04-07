@@ -1,26 +1,23 @@
-﻿#nullable disable
+﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
+
 namespace PGDCP.Models
 {
-    // Validación personalizada para verificar que el usuario sea mayor de edad.
     public class MayorDeEdadAttribute : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value is DateTime fecha)
             {
-                // No puede ser hoy ni una fecha futura
                 if (fecha.Date >= DateTime.Today)
                     return new ValidationResult("La fecha de nacimiento no puede ser hoy ni una fecha futura.");
 
-                // Debe ser mayor de 18 años
                 var edad = DateTime.Today.Year - fecha.Year;
                 if (fecha.Date > DateTime.Today.AddYears(-edad)) edad--;
 
                 if (edad < 18)
                     return new ValidationResult("Debes ser mayor de 18 años para registrarte.");
             }
-
             return ValidationResult.Success;
         }
     }
@@ -41,7 +38,7 @@ namespace PGDCP.Models
         public string? Apellido { get; set; }
 
         [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
-        [MayorDeEdad] // Validación personalizada
+        [MayorDeEdad]
         public DateTime FechaNacimiento { get; set; }
 
         [Required(ErrorMessage = "El sexo es obligatorio.")]
@@ -49,9 +46,5 @@ namespace PGDCP.Models
 
         [Phone(ErrorMessage = "Formato de teléfono no válido.")]
         public string? Telefono { get; set; }
-
-        public string? Rol { get; set; }
     }
 }
-
-

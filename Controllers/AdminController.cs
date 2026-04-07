@@ -18,7 +18,6 @@ namespace PGDCP.Controllers
             UserManager<IdentityUser> um, RoleManager<IdentityRole> rm)
         { _context = ctx; _userManager = um; _roleManager = rm; }
 
-        // Panel principal con estadisticas
         public async Task<IActionResult> Index()
         {
             ViewBag.TotalObras = await _context.Obras.CountAsync();
@@ -30,7 +29,6 @@ namespace PGDCP.Controllers
             return View();
         }
 
-        // Lista de todos los usuarios con sus roles
         public async Task<IActionResult> Usuarios()
         {
             var users = _userManager.Users.ToList();
@@ -42,7 +40,6 @@ namespace PGDCP.Controllers
             return View();
         }
 
-        // Mostrar formulario de edicion de un usuario (GET)
         public async Task<IActionResult> EditarUsuario(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -57,7 +54,6 @@ namespace PGDCP.Controllers
             return View(perfil);
         }
 
-        // Guardar cambios de edicion del usuario (POST)
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarUsuario(string userId,
             string nombre, string apellido, string telefono,
@@ -65,27 +61,31 @@ namespace PGDCP.Controllers
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
+
             var perfil = await _context.PerfilesUsuario
                 .FirstOrDefaultAsync(p => p.UserId == userId);
+
             if (perfil != null)
             {
                 perfil.Nombre = nombre;
                 perfil.Apellido = apellido;
                 perfil.Telefono = telefono;
                 perfil.Sexo = sexo;
-                perfil.Rol = rol;
                 perfil.FechaNacimiento = fechaNacimiento;
+                // ── perfil.Rol eliminado, el rol solo vive en Identity ──
                 _context.Update(perfil);
                 await _context.SaveChangesAsync();
             }
+
+            // Actualizar rol en Identity
             var rolesActuales = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, rolesActuales);
             await _userManager.AddToRoleAsync(user, rol);
+
             TempData["Success"] = $"Usuario {user.Email} actualizado.";
             return RedirectToAction(nameof(Usuarios));
         }
 
-        // Asignar rol rapido desde la lista (POST)
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AsignarRol(string userId, string rol)
         {
@@ -98,7 +98,6 @@ namespace PGDCP.Controllers
             return RedirectToAction(nameof(Usuarios));
         }
 
-        // Confirmar eliminacion (GET)
         public async Task<IActionResult> EliminarUsuario(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -112,18 +111,19 @@ namespace PGDCP.Controllers
             return View();
         }
 
-        // Ejecutar eliminacion (POST)
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmarEliminar(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
+
             var usuarioActual = await _userManager.GetUserAsync(User);
             if (usuarioActual?.Id == userId)
             {
                 TempData["Error"] = "No puedes eliminar tu propia cuenta.";
                 return RedirectToAction(nameof(Usuarios));
             }
+
             var perfil = await _context.PerfilesUsuario
                 .FirstOrDefaultAsync(p => p.UserId == userId);
             if (perfil != null)
@@ -131,13 +131,13 @@ namespace PGDCP.Controllers
                 _context.PerfilesUsuario.Remove(perfil);
                 await _context.SaveChangesAsync();
             }
+
             var result = await _userManager.DeleteAsync(user);
-            if (result.Succeeded)
-                TempData["Success"] = $"Usuario {user.Email} eliminado.";
-            else
-                TempData["Error"] = "No se pudo eliminar el usuario.";
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
+                ? $"Usuario {user.Email} eliminado."
+                : "No se pudo eliminar el usuario.";
+
             return RedirectToAction(nameof(Usuarios));
         }
     }
 }
-

@@ -8,7 +8,7 @@ using PGDCP.Data;
 
 #nullable disable
 
-namespace PGDCP.Data.Migrations
+namespace PGDCP.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -41,7 +41,7 @@ namespace PGDCP.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RestauradorId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Tratamiento")
                         .HasColumnType("nvarchar(max)");
@@ -49,6 +49,8 @@ namespace PGDCP.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ObraId");
+
+                    b.HasIndex("RestauradorId");
 
                     b.ToTable("Conservaciones");
                 });
@@ -255,7 +257,73 @@ namespace PGDCP.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PGDCP.Models.LoginUsuario", b =>
+            modelBuilder.Entity("PGDCP.Models.Categoria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categorias");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.Epoca", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<short?>("SigloDesde")
+                        .HasColumnType("smallint");
+
+                    b.Property<short?>("SigloHasta")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Epocas");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.Estilo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Estilos");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.LoginSeguridad", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -266,10 +334,6 @@ namespace PGDCP.Data.Migrations
                     b.Property<DateTime?>("BloqueadoHasta")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("IntentosFallidos")
                         .HasColumnType("int");
 
@@ -278,11 +342,34 @@ namespace PGDCP.Data.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("LoginSeguridad", (string)null);
+                });
+
+            modelBuilder.Entity("PGDCP.Models.Material", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("LoginUsuarios");
+                    b.ToTable("Materiales");
                 });
 
             modelBuilder.Entity("PGDCP.Models.Obra", b =>
@@ -296,34 +383,89 @@ namespace PGDCP.Data.Migrations
                     b.Property<string>("Autor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Epoca")
+                    b.Property<int?>("CategoriaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Estilo")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("EpocaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EstiloId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("FechaAdquisicion")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ImagenUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Material")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UbicacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("ValorEstimado")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoriaId");
+
+                    b.HasIndex("EpocaId");
+
+                    b.HasIndex("EstiloId");
+
+                    b.HasIndex("UbicacionId");
+
                     b.ToTable("Obras");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.ObraImagen", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("EsPrincipal")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("FechaSubida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ObraId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObraId");
+
+                    b.ToTable("ObraImagenes");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.ObraMaterial", b =>
+                {
+                    b.Property<int>("ObraId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ObraId", "MaterialId");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("ObraMateriales");
                 });
 
             modelBuilder.Entity("PGDCP.Models.PerfilUsuario", b =>
@@ -347,9 +489,6 @@ namespace PGDCP.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Rol")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Sexo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -363,6 +502,29 @@ namespace PGDCP.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PerfilesUsuario");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.Ubicacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Direccion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ubicaciones");
                 });
 
             modelBuilder.Entity("PGDCP.Models.Valoracion", b =>
@@ -383,14 +545,17 @@ namespace PGDCP.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PeritoId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("ValorEstimado")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ObraId");
+
+                    b.HasIndex("PeritoId");
 
                     b.ToTable("Valoraciones");
                 });
@@ -402,6 +567,11 @@ namespace PGDCP.Data.Migrations
                         .HasForeignKey("ObraId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("RestauradorId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Obra");
                 });
@@ -457,6 +627,63 @@ namespace PGDCP.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PGDCP.Models.Obra", b =>
+                {
+                    b.HasOne("PGDCP.Models.Categoria", "Categoria")
+                        .WithMany()
+                        .HasForeignKey("CategoriaId");
+
+                    b.HasOne("PGDCP.Models.Epoca", "Epoca")
+                        .WithMany()
+                        .HasForeignKey("EpocaId");
+
+                    b.HasOne("PGDCP.Models.Estilo", "Estilo")
+                        .WithMany()
+                        .HasForeignKey("EstiloId");
+
+                    b.HasOne("PGDCP.Models.Ubicacion", "Ubicacion")
+                        .WithMany()
+                        .HasForeignKey("UbicacionId");
+
+                    b.Navigation("Categoria");
+
+                    b.Navigation("Epoca");
+
+                    b.Navigation("Estilo");
+
+                    b.Navigation("Ubicacion");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.ObraImagen", b =>
+                {
+                    b.HasOne("PGDCP.Models.Obra", "Obra")
+                        .WithMany("Imagenes")
+                        .HasForeignKey("ObraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Obra");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.ObraMaterial", b =>
+                {
+                    b.HasOne("PGDCP.Models.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PGDCP.Models.Obra", "Obra")
+                        .WithMany("ObraMateriales")
+                        .HasForeignKey("ObraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+
+                    b.Navigation("Obra");
+                });
+
             modelBuilder.Entity("PGDCP.Models.Valoracion", b =>
                 {
                     b.HasOne("PGDCP.Models.Obra", "Obra")
@@ -465,7 +692,19 @@ namespace PGDCP.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("PeritoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Obra");
+                });
+
+            modelBuilder.Entity("PGDCP.Models.Obra", b =>
+                {
+                    b.Navigation("Imagenes");
+
+                    b.Navigation("ObraMateriales");
                 });
 #pragma warning restore 612, 618
         }
