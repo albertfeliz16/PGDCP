@@ -1,14 +1,11 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
+﻿#nullable disable
 using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using PGDCP.Data;
+using PGDCP.Models;
 
 namespace PGDCP.Areas.Identity.Pages.Account.Manage
 {
@@ -16,71 +13,69 @@ namespace PGDCP.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ApplicationDbContext _context;
 
-        public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+        public IndexModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Teléfono")]
             public string PhoneNumber { get; set; }
+
+            [Required(ErrorMessage = "El nombre es obligatorio")]
+            public string Nombre { get; set; }
+
+            [Required(ErrorMessage = "El apellido es obligatorio")]
+            public string Apellido { get; set; }
+
+            [Required]
+            [DataType(DataType.Date)]
+            public DateTime FechaNacimiento { get; set; }
+
+            [Required] public string Sexo { get; set; }
         }
 
+        // --- ESTE ES EL MÉTODO QUE TE FALTABA ---
         private async Task LoadAsync(IdentityUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
+            string userIdActual = user.Id; // QUITA EL ERROR DE ÁRBOL DINÁMICO
+
+            var perfil = await _context.PerfilesUsuario
+                .FirstOrDefaultAsync(p => p.UserId == userIdActual);
+
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Nombre = perfil?.Nombre ?? "",
+                Apellido = perfil?.Apellido ?? "",
+                FechaNacimiento = perfil?.FechaNacimiento ?? DateTime.Today.AddYears(-18),
+                Sexo = perfil?.Sexo ?? ""
             };
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
+            if (user == null) return NotFound("Error al cargar usuario");
             await LoadAsync(user);
             return Page();
         }
@@ -90,7 +85,7 @@ namespace PGDCP.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"No se pudo cargar el usuario.");
             }
 
             if (!ModelState.IsValid)
@@ -99,19 +94,31 @@ namespace PGDCP.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            string userIdActual = user.Id; // QUITA EL ERROR DE ÁRBOL DINÁMICO
+
+            var perfil = await _context.PerfilesUsuario
+                .FirstOrDefaultAsync(p => p.UserId == userIdActual);
+
+            if (perfil != null)
+            {
+                perfil.Nombre = Input.Nombre;
+                perfil.Apellido = Input.Apellido;
+                perfil.FechaNacimiento = Input.FechaNacimiento;
+                perfil.Sexo = Input.Sexo;
+                perfil.Telefono = Input.PhoneNumber;
+
+                _context.PerfilesUsuario.Update(perfil);
+                await _context.SaveChangesAsync();
+            }
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
+                await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Tu perfil ha sido actualizado con éxito en SQL Server";
             return RedirectToPage();
         }
     }

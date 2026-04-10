@@ -16,22 +16,28 @@ namespace PGDCP.Data
         public DbSet<Conservacion> Conservaciones { get; set; }
         public DbSet<Valoracion> Valoraciones { get; set; }
 
-        // ── Catálogos ──
+        // ── Catálogo ──
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Epoca> Epocas { get; set; }
         public DbSet<Estilo> Estilos { get; set; }
         public DbSet<Material> Materiales { get; set; }
         public DbSet<Ubicacion> Ubicaciones { get; set; }
+        public DbSet<EstadoConservacion> EstadosConservacion { get; set; }
+        public DbSet<Tecnica> Tecnicas { get; set; }
 
-        // ── Tablas relacionales ──
+        // ── Tablas relacionales y Auditoría ──
         public DbSet<ObraImagen> ObraImagenes { get; set; }
         public DbSet<ObraMaterial> ObraMateriales { get; set; }
+        public DbSet<AuditoriaLogin> AuditoriasLogin { get; set; }
+        public DbSet<LogCambio> LogCambios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<LoginSeguridad>().ToTable("LoginSeguridad");
+            builder.Entity<AuditoriaLogin>().ToTable("AuditoriaLogin");
+            builder.Entity<LogCambio>().ToTable("LogCambios");
 
             builder.Entity<ObraMaterial>()
                 .HasKey(om => new { om.ObraId, om.MaterialId });
@@ -40,7 +46,6 @@ namespace PGDCP.Data
                 .HasIndex(l => l.UserId)
                 .IsUnique();
 
-            // Precisión explícita en decimales
             builder.Entity<Obra>()
                 .Property(o => o.ValorEstimado)
                 .HasPrecision(18, 2);
@@ -59,6 +64,12 @@ namespace PGDCP.Data
                 .HasOne<Microsoft.AspNetCore.Identity.IdentityUser>()
                 .WithMany()
                 .HasForeignKey(v => v.PeritoId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<Obra>()
+                .HasOne(o => o.Tecnica)
+                .WithMany(t => t.Obras)
+                .HasForeignKey(o => o.TecnicaId)
                 .OnDelete(DeleteBehavior.SetNull);
         }
     }

@@ -73,6 +73,16 @@ namespace PGDCP.Controllers
             [Bind("Titulo,Autor,CategoriaId,EpocaId,EstiloId,UbicacionId,Descripcion,FechaAdquisicion,ValorEstimado")] Obra obra,
             IFormFile? imagenArchivo)
         {
+            
+            if (!string.IsNullOrEmpty(obra.Titulo))
+            {
+                bool existe = await _context.Obras.AnyAsync(o => o.Titulo.ToLower().Trim() == obra.Titulo.ToLower().Trim());
+                if (existe)
+                {
+                    ModelState.AddModelError("Titulo", "Ya existe una obra registrada con este título.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 obra.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -80,7 +90,6 @@ namespace PGDCP.Controllers
                 _context.Add(obra);
                 await _context.SaveChangesAsync();
 
-                // Guardar imagen si se subió
                 if (imagenArchivo != null && imagenArchivo.Length > 0)
                 {
                     var urlImagen = await GuardarImagen(imagenArchivo);
@@ -128,6 +137,17 @@ namespace PGDCP.Controllers
         {
             if (id != obra.Id) return NotFound();
 
+            // --- VALIDACIÓN DE UNICIDAD PARA EDICIÓN (NUEVO) ---
+            if (!string.IsNullOrEmpty(obra.Titulo))
+            {
+                bool existe = await _context.Obras.AnyAsync(o =>
+                    o.Titulo.ToLower().Trim() == obra.Titulo.ToLower().Trim() && o.Id != id);
+                if (existe)
+                {
+                    ModelState.AddModelError("Titulo", "No se puede actualizar: Otra obra ya tiene este título.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -139,7 +159,6 @@ namespace PGDCP.Controllers
                     _context.Update(obra);
                     await _context.SaveChangesAsync();
 
-                    // Guardar nueva imagen si se subió
                     if (imagenArchivo != null && imagenArchivo.Length > 0)
                     {
                         var urlImagen = await GuardarImagen(imagenArchivo);
@@ -149,7 +168,6 @@ namespace PGDCP.Controllers
                             CargarCatalogos(obra);
                             return View(obra);
                         }
-                        // Marcar las anteriores como no principales
                         var imagenesAnteriores = await _context.ObraImagenes
                             .Where(i => i.ObraId == id).ToListAsync();
                         foreach (var img in imagenesAnteriores)
@@ -199,8 +217,6 @@ namespace PGDCP.Controllers
             TempData["Success"] = "Obra eliminada.";
             return RedirectToAction(nameof(Index));
         }
-
-        // ── Helpers privados ──
 
         private void CargarCatalogos(Obra? obra = null)
         {
