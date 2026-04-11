@@ -28,10 +28,18 @@
         {
             <li class="nav-item"><span class="role-pill role-col">Coleccionista</span></li>
         }
+
         <li class="nav-item">
-            <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index"
-               style="color:var(--gold)!important;font-size:.78rem;">@User.Identity?.Name</a>
+            @* LÍNEA ACTUALIZADA: Ahora apunta a tu controlador y vista de Seguridad *@
+            <a class="nav-link text-uppercase fw-bold"
+                   asp-area=""
+                   asp-controller="Configuracion"
+                   asp-action="Seguridad"
+                   style="color:var(--gold)!important; font-size:.78rem; letter-spacing: 0.5px;">
+                @User.Identity?.Name
+            </a>
         </li>
+
         <li class="nav-item">
             <form class="m-0" asp-controller="Login" asp-action="Salir" method="post">
                 @Html.AntiForgeryToken()

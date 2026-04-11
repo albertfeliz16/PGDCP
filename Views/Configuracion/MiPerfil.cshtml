@@ -1,0 +1,49 @@
+﻿@model PGDCP.Models.PerfilUsuarioViewModel
+@{
+    ViewData["Title"] = "Mi Perfil";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0" style="background-color: #fdfcf9; border-radius: 15px;">
+                <div class="card-header bg-transparent border-0 pt-4 text-center">
+                    <h2 style="color: #8B7344; font-family: 'Playfair Display', serif;">Información de Perfil</h2>
+                    <p class="text-muted small">Actualiza tus datos personales en la plataforma</p>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="MiPerfil" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">NOMBRE</label>
+                                <input asp-for="Nombre" class="form-control" style="border-color: #e2d9c5;" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">APELLIDO</label>
+                                <input asp-for="Apellido" class="form-control" style="border-color: #e2d9c5;" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">FECHA NACIMIENTO</label>
+                                <input asp-for="FechaNacimiento" type="date" class="form-control" style="border-color: #e2d9c5;" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">SEXO</label>
+                                <select asp-for="Sexo" class="form-select" style="border-color: #e2d9c5;">
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold small">TELÉFONO</label>
+                                <input asp-for="Telefono" class="form-control" style="border-color: #e2d9c5;" />
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn px-5 text-white" style="background-color: #8B7344; font-weight: bold;">GUARDAR PERFIL</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

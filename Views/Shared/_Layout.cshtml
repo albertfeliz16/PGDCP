@@ -4,38 +4,40 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — PGDCP</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PGDCP.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md">
+        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">PGDCP</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-expanded="false">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index" style="color:#8B7344;">PGDCP</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-md-flex align-items-center justify-content-between">
+                    @* --- INICIO DEL MENÚ QUE ME PASASTE --- *@
                     <ul class="navbar-nav gap-1">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
+                        
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Perfil" asp-action="Index">Mi Perfil</a>
+                                <a class="nav-link" asp-controller="Configuracion" asp-action="MiPerfil">Mi Perfil</a>
                             </li>
+                            
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Obras" asp-action="Index">Obras</a>
                             </li>
+                            
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     Catálogos
                                 </a>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu shadow-sm border-0">
                                     <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Categorias">Categorías</a></li>
                                     <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Epocas">Épocas</a></li>
                                     <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Estilos">Estilos</a></li>
@@ -44,18 +46,21 @@
                                 </ul>
                             </li>
                         }
+
                         @if (User.IsInRole("Administrador") || User.IsInRole("Restaurador"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Conservacions" asp-action="Index">Conservación</a>
                             </li>
                         }
+                        
                         @if (User.IsInRole("Administrador") || User.IsInRole("Perito"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Valoracions" asp-action="Index">Valoraciones</a>
                             </li>
                         }
+                        
                         @if (User.IsInRole("Administrador"))
                         {
                             <li class="nav-item">
@@ -63,24 +68,27 @@
                             </li>
                         }
                     </ul>
+                    @* --- FIN DEL MENÚ --- *@
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-auto mt-3">✓ @TempData["Success"]</div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-auto mt-3">⚠ @TempData["Error"]</div>
-        }
-        <main role="main" class="pb-3 fade-in">
+        <main role="main" class="pb-3">
+            @* LÍNEA OBLIGATORIA: Esto es lo que faltaba y causaba el error *@
             @RenderBody()
         </main>
     </div>
+
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container text-center py-3">
+            &copy; @DateTime.Now.Year - PGDCP - Patrimonio y Conservación
+        </div>
+    </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
