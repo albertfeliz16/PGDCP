@@ -177,5 +177,6 @@ namespace PGDCP.Controllers
             if (item != null) { _context.Materiales.Remove(item); await _context.SaveChangesAsync(); TempData["Success"] = "Material eliminado."; }
             return RedirectToAction(nameof(Materiales));
         }
+        public IActionResult Index() { return View(); }
     }
 }

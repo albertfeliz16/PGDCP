@@ -19,6 +19,7 @@ namespace PGDCP.Controllers
             _context = context;
         }
 
+        // --- VISTA MI PERFIL ---
         [HttpGet]
         public async Task<IActionResult> MiPerfil()
         {
@@ -43,12 +44,10 @@ namespace PGDCP.Controllers
         public async Task<IActionResult> MiPerfil(PerfilUsuarioViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
 
             var perfil = await _context.PerfilesUsuario.FirstOrDefaultAsync(p => p.UserId == user.Id);
-
             if (perfil == null)
             {
                 perfil = new PerfilUsuario { UserId = user.Id };
@@ -62,8 +61,44 @@ namespace PGDCP.Controllers
             perfil.Telefono = model.Telefono;
 
             await _context.SaveChangesAsync();
-            TempData["Mensaje"] = "Datos actualizados correctamente.";
+            TempData["Success"] = "Perfil actualizado correctamente.";
             return RedirectToAction(nameof(MiPerfil));
+        }
+
+        // --- VISTA SEGURIDAD ---
+        [HttpGet]
+        public async Task<IActionResult> Seguridad()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+            return View(new SeguridadViewModel { Email = user.Email ?? "" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Seguridad(SeguridadViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            if (model.Email != user.Email)
+            {
+                await _userManager.SetEmailAsync(user, model.Email);
+                await _userManager.SetUserNameAsync(user, model.Email);
+            }
+
+            if (!string.IsNullOrEmpty(model.OldPassword) && !string.IsNullOrEmpty(model.NewPassword))
+            {
+                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
+                    return View(model);
+                }
+            }
+
+            TempData["Success"] = "Credenciales actualizadas.";
+            return RedirectToAction(nameof(Seguridad));
         }
     }
 }

@@ -3,73 +3,104 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — PGDCP</title>
+    <title>@ViewData["Title"] - PGDCP</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PGDCP.styles.css" asp-append-version="true" />
+    <style>
+        :root { --gold: #8B7344; }
+        .navbar { background-color: #fdfcf9 !important; border-bottom: 2px solid #e2d9c5 !important; }
+        .nav-link { color: #5a5a5a !important; font-weight: 500; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .nav-link:hover { color: var(--gold) !important; }
+        .dropdown-menu { border-radius: 8px; border: 1px solid #e2d9c5; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07); }
+        .dropdown-item { font-size: 0.85rem; padding: 0.6rem 1.2rem; }
+        .dropdown-item:hover { background-color: #f4eee0; color: var(--gold); }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3">
+        <nav class="navbar navbar-expand-md shadow-sm mb-4">
             <div class="container">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index" style="color:#8B7344;">PGDCP</a>
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index" style="color:var(--gold);">
+                    <i class="bi bi-bank me-2"></i>PGDCP
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                
                 <div class="navbar-collapse collapse d-md-flex align-items-center justify-content-between">
-                    @* --- INICIO DEL MENÚ QUE ME PASASTE --- *@
-                    <ul class="navbar-nav gap-1">
+                    <ul class="navbar-nav gap-2">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         
                         @if (User.Identity?.IsAuthenticated == true)
                         {
+                            @* --- MENÚ INVENTARIO DINÁMICO --- *@
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    Inventario
+                                </a>
+                                <ul class="dropdown-menu shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item fw-bold" asp-controller="Obras" asp-action="Index">
+                                            <i class="bi bi-images me-2"></i>Catálogo de Obras
+                                        </a>
+                                    </li>
+
+                                    @* FILTRO DE SEGURIDAD: Solo el Administrador ve las tablas maestras *@
+                                    @if (User.IsInRole("Administrador"))
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li class="dropdown-header text-uppercase small fw-bold text-muted" style="font-size: 0.65rem;">Configuración Técnica</li>
+                                        <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Categorias">Categorías</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Epocas">Épocas</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Estilos">Estilos</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Ubicaciones">Ubicaciones</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Materiales">Materiales</a></li>
+                                    }
+                                </ul>
+                            </li>
+
+                            @* --- MENÚ SERVICIOS --- *@
+                            @if (User.IsInRole("Administrador") || User.IsInRole("Restaurador") || User.IsInRole("Perito"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Servicios</a>
+                                    <ul class="dropdown-menu shadow-sm">
+                                        @if (User.IsInRole("Administrador") || User.IsInRole("Restaurador"))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Conservacions" asp-action="Index"><i class="bi bi-tools me-2"></i>Conservación</a></li>
+                                        }
+                                        @if (User.IsInRole("Administrador") || User.IsInRole("Perito"))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Valoracions" asp-action="Index"><i class="bi bi-currency-dollar me-2"></i>Valoraciones</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Configuracion" asp-action="MiPerfil">Mi Perfil</a>
                             </li>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Obras" asp-action="Index">Obras</a>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    Catálogos
-                                </a>
-                                <ul class="dropdown-menu shadow-sm border-0">
-                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Categorias">Categorías</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Epocas">Épocas</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Estilos">Estilos</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Ubicaciones">Ubicaciones</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Catalogos" asp-action="Materiales">Materiales</a></li>
-                                </ul>
-                            </li>
-                        }
 
-                        @if (User.IsInRole("Administrador") || User.IsInRole("Restaurador"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Conservacions" asp-action="Index">Conservación</a>
-                            </li>
-                        }
-                        
-                        @if (User.IsInRole("Administrador") || User.IsInRole("Perito"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Valoracions" asp-action="Index">Valoraciones</a>
-                            </li>
-                        }
-                        
-                        @if (User.IsInRole("Administrador"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Admin" asp-action="Index">Admin</a>
-                            </li>
+                            @* --- MENÚ ADMINISTRACIÓN UNIFICADO --- *@
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <li class="nav-item dropdown ms-md-2">
+                                    <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown" style="color:var(--gold) !important;">
+                                        <i class="bi bi-shield-lock me-1"></i>Administración
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                        <li><a class="dropdown-item fw-bold" asp-controller="Admin" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Panel de Control</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Usuarios"><i class="bi bi-people me-2"></i>Gestión de Usuarios</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Roles"><i class="bi bi-key me-2"></i>Gestión de Roles</a></li>
+                                    </ul>
+                                </li>
+                            }
                         }
                     </ul>
-                    @* --- FIN DEL MENÚ --- *@
-
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -78,16 +109,9 @@
 
     <div class="container">
         <main role="main" class="pb-3">
-            @* LÍNEA OBLIGATORIA: Esto es lo que faltaba y causaba el error *@
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted mt-5">
-        <div class="container text-center py-3">
-            &copy; @DateTime.Now.Year - PGDCP - Patrimonio y Conservación
-        </div>
-    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

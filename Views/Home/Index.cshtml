@@ -4,272 +4,148 @@
     var userName = User.Identity?.Name?.Split('@')[0] ?? "";
 }
 
-@if (!User.Identity?.IsAuthenticated ?? true)
+<style>
+    :root { --gold: #8B7344; --gold-light: #B59E72; --ivory: #2C2C2C; --teal: #4A707A; }
+    .stat-card { background: #fdfcf9; border-radius: 15px; padding: 1.5rem; border: 1px solid #e2d9c5; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s; height: 100%; }
+    .stat-card:hover { transform: translateY(-3px); }
+    .stat-label { font-size: 0.75rem; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 2rem; font-weight: bold; color: var(--gold); font-family: 'Playfair Display', serif; }
+    .badge-gold { background: var(--gold); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+    .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #eee; }
+    .action-link { color: var(--gold); text-decoration: none; font-weight: 600; }
+</style>
+
+@if (User.Identity?.IsAuthenticated == true)
 {
-    <section class="hero">
-        <span class="hero-eyebrow">Patrimonio Cultural Privado</span>
-        <h1>Plataforma de Gestión del<br><em>Patrimonio Cultural</em></h1>
-        <p class="hero-sub">Centraliza, documenta y protege tu patrimonio cultural. Expedientes técnicos, valoraciones, conservación y certificación en una sola plataforma.</p>
-        <div class="ornament" style="max-width:400px;margin:2.5rem auto 0;">Plataforma Privada · Acceso Controlado</div>
-    </section>
-    <hr class="divider">
-    <div class="stats-grid stagger" style="max-width:900px;">
-        <div class="stat-card"><div class="stat-label">Módulo principal</div><div class="stat-value" style="font-size:1.6rem;">Obras</div><div class="stat-sub">Catálogo técnico de piezas culturales</div></div>
-        <div class="stat-card"><div class="stat-label">Módulo técnico</div><div class="stat-value" style="font-size:1.6rem;">Conservación</div><div class="stat-sub">Diagnósticos y registros de restauración</div></div>
-        <div class="stat-card"><div class="stat-label">Módulo legal</div><div class="stat-value" style="font-size:1.6rem;">Valoraciones</div><div class="stat-sub">Peritajes y certificaciones periciales</div></div>
-    </div>
-}
-else if (User.IsInRole("Administrador"))
-{
-    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-        <h1 style="margin:0;">Panel <em style="color:var(--gold-light);">Administrador</em></h1>
-        <span class="badge badge-gold">Control total del sistema</span>
-    </div>
-    <div class="stats-grid stagger">
-        <div class="stat-card"><div class="stat-label">Total obras</div><div class="stat-value">@ViewBag.TotalObras</div><div class="stat-sub">En el catálogo</div></div>
-        <div class="stat-card"><div class="stat-label">Conservaciones</div><div class="stat-value">@ViewBag.TotalConservaciones</div><div class="stat-sub">Registros técnicos</div></div>
-        <div class="stat-card"><div class="stat-label">Valoraciones</div><div class="stat-value">@ViewBag.TotalValoraciones</div><div class="stat-sub">Peritajes registrados</div></div>
-        <div class="stat-card"><div class="stat-label">Valor total colección</div><div class="stat-value" style="font-size:1.7rem;">$@String.Format("{0:N0}", ViewBag.ValorTotal)</div><div class="stat-sub">USD estimado</div></div>
-    </div>
-    <div class="role-callout"><span>👑</span><span>Tienes acceso completo al sistema. Puedes gestionar obras, conservación, valoraciones y asignar roles a los usuarios desde el <a asp-controller="Admin" asp-action="Index" style="color:var(--gold);">Panel Admin</a>.</span></div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Acceso rápido</h2>
-    </div>
-    <div class="row g-3 stagger" style="max-width:900px;">
-        <div class="col-md-3">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Obras</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Obras" asp-action="Index" class="btn btn-outline-light btn-sm">Ver catálogo</a>
-                    <a asp-controller="Obras" asp-action="Create" class="btn btn-primary btn-sm">+ Nueva</a>
+    @* --- TODO EL CONTENIDO PARA USUARIOS LOGUEADOS (Dashboard) --- *@
+    <div class="container py-4">
+        <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+            @if (User.IsInRole("Administrador")) { 
+                <h1>Panel <em style="color:var(--gold-light);">Administrador</em></h1> <span class="badge-gold">Control total del sistema</span> 
+            } else { 
+                <h1>Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1> <span class="badge-gold" style="background:#e83e8c;">Coleccionista</span> 
+            }
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Total Obras</div>
+                    <div class="stat-value">@ViewBag.TotalObras</div>
+                </div>
+            </div>
+            @if (User.IsInRole("Administrador") || User.IsInRole("Restaurador")) {
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-label">Conservaciones</div>
+                        <div class="stat-value">@ViewBag.TotalConservaciones</div>
+                    </div>
+                </div>
+            }
+            @if (User.IsInRole("Administrador") || User.IsInRole("Perito")) {
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-label">Valoraciones</div>
+                        <div class="stat-value">@ViewBag.TotalValoraciones</div>
+                    </div>
+                </div>
+            }
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-label">Valor Colección</div>
+                    <div class="stat-value" style="font-size:1.5rem;">$@String.Format("{0:N0}", ViewBag.ValorTotal)</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Conservación</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Conservacions" asp-action="Index" class="btn btn-outline-light btn-sm">Ver registros</a>
-                    <a asp-controller="Conservacions" asp-action="Create" class="btn btn-teal btn-sm">+ Nuevo</a>
+
+        <h3 class="h5 fw-bold mb-3">Acceso rápido</h3>
+        <div class="row g-3 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card p-3 border-0 shadow-sm text-center">
+                    <div class="stat-label mb-2">Obras</div>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Obras" asp-action="Index" class="btn btn-sm btn-outline-secondary">Ver Catálogo</a>
+                        <a asp-controller="Obras" asp-action="Create" class="btn btn-sm btn-gold" style="background:var(--gold); color:white;">+ Nueva</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Valoraciones</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Valoracions" asp-action="Index" class="btn btn-outline-light btn-sm">Ver peritajes</a>
-                    <a asp-controller="Valoracions" asp-action="Create" class="btn btn-outline-light btn-sm">+ Nuevo</a>
+            @if (User.IsInRole("Administrador")) {
+                <div class="col-md-3">
+                    <div class="stat-card p-3 text-center" style="background:#f8f5f0; border: 1px dashed var(--gold);">
+                        <div class="stat-label mb-2">Usuarios</div>
+                        <div class="d-grid gap-2">
+                            <a asp-controller="Admin" asp-action="Usuarios" class="btn btn-sm btn-outline-dark">Gestionar</a>
+                            <a asp-controller="Admin" asp-action="Index" class="btn btn-sm btn-dark">Panel Admin</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
-        <div class="col-md-3">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Usuarios</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Admin" asp-action="Usuarios" class="btn btn-outline-light btn-sm">Gestionar</a>
-                    <a asp-controller="Admin" asp-action="Index" class="btn btn-gold btn-sm">Panel Admin</a>
-                </div>
-            </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h5 fw-bold m-0">Obras recientes</h3>
+            <a asp-controller="Obras" asp-action="Index" class="btn btn-sm btn-link action-link">Ver todas</a>
         </div>
-    </div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Obras recientes</h2>
-        <a asp-controller="Obras" asp-action="Index" class="btn btn-sm btn-outline-light">Ver todas</a>
-    </div>
-    @if (ViewBag.ObrasRecientes != null && ((List<Obra>)ViewBag.ObrasRecientes).Count > 0)
-    {
-        <div class="table-wrapper fade-in">
-            <table class="table">
-                <thead><tr><th>Título</th><th>Autor</th><th>Época</th><th>Valor estimado</th><th></th></tr></thead>
+        <div class="table-wrapper shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr><th>Título</th><th>Autor</th><th>Época</th><th>Valor Estimado</th><th>Acción</th></tr>
+                </thead>
                 <tbody>
-                    @foreach (var obra in (List<Obra>)ViewBag.ObrasRecientes)
-                    {
-                        <tr>
-                            <td><span style="font-family:var(--fd);color:var(--ivory);">@obra.Titulo</span></td>
-                            <td>@obra.Autor</td>
-                            <td><span class="badge badge-teal">@obra.Epoca?.Nombre</span></td>
-                            <td><span style="color:var(--gold-light);font-family:var(--fd);">$@obra.ValorEstimado.ToString("N0")</span></td>
-                            <td><a class="action-link" asp-controller="Obras" asp-action="Details" asp-route-id="@obra.Id">Ver →</a></td>
-                        </tr>
+                    @if (ViewBag.ObrasRecientes != null) {
+                        @foreach (var obra in (List<Obra>)ViewBag.ObrasRecientes) {
+                            <tr>
+                                <td class="fw-bold">@obra.Titulo</td>
+                                <td>@obra.Autor</td>
+                                <td><span class="badge bg-light text-dark border">@obra.Epoca?.Nombre</span></td>
+                                <td class="fw-bold" style="color:var(--gold);">$@obra.ValorEstimado.ToString("N0")</td>
+                                <td><a asp-controller="Obras" asp-action="Details" asp-route-id="@obra.Id" class="action-link">Ver →</a></td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
-    }
-}
-else if (User.IsInRole("Restaurador"))
-{
-    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-        <h1 style="margin:0;">Panel <em style="color:var(--gold-light);">Restaurador</em></h1>
-        <span class="badge badge-teal">Conservación y restauración</span>
     </div>
-    <div class="stats-grid stagger">
-        <div class="stat-card"><div class="stat-label">Total obras</div><div class="stat-value">@ViewBag.TotalObras</div><div class="stat-sub">Disponibles para intervención</div></div>
-        <div class="stat-card"><div class="stat-label">Conservaciones</div><div class="stat-value">@ViewBag.TotalConservaciones</div><div class="stat-sub">Registros en el sistema</div></div>
-    </div>
-    <div class="role-callout"><span>🔬</span><span>Como <strong>Restaurador</strong> puedes registrar y editar diagnósticos de conservación en todas las obras. Solo el Administrador puede eliminar registros.</span></div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Acceso rápido</h2>
-    </div>
-    <div class="row g-3 stagger" style="max-width:600px;">
-        <div class="col-md-6">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Conservación</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Conservacions" asp-action="Index" class="btn btn-outline-light btn-sm">Ver todos los registros</a>
-                    <a asp-controller="Conservacions" asp-action="Create" class="btn btn-teal btn-sm">+ Nuevo diagnóstico</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Catálogo de obras</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Obras" asp-action="Index" class="btn btn-outline-light btn-sm">Consultar obras</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Últimas intervenciones</h2>
-        <a asp-controller="Conservacions" asp-action="Index" class="btn btn-sm btn-outline-light">Ver todas</a>
-    </div>
-    @if (ViewBag.UltimasConservaciones != null && ((List<Conservacion>)ViewBag.UltimasConservaciones).Count > 0)
-    {
-        <div class="table-wrapper fade-in">
-            <table class="table">
-                <thead><tr><th>Obra</th><th>Diagnóstico</th><th>Fecha</th><th></th></tr></thead>
-                <tbody>
-                    @foreach (var c in (List<Conservacion>)ViewBag.UltimasConservaciones)
-                    {
-                        <tr>
-                            <td><span style="font-family:var(--fd);color:var(--ivory);">@(c.Obra?.Titulo ?? $"#{c.ObraId}")</span></td>
-                            <td style="color:var(--text-muted);font-size:.85rem;">@(c.Diagnostico.Length > 60 ? c.Diagnostico[..60] + "..." : c.Diagnostico)</td>
-                            <td style="color:var(--text-muted);font-size:.82rem;">@c.FechaIntervencion.ToString("dd/MM/yyyy")</td>
-                            <td><a class="action-link" asp-controller="Conservacions" asp-action="Details" asp-route-id="@c.Id">Ver →</a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-}
-else if (User.IsInRole("Perito"))
-{
-    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-        <h1 style="margin:0;">Panel <em style="color:var(--gold-light);">Perito</em></h1>
-        <span class="badge badge-purple">Valoraciones periciales</span>
-    </div>
-    <div class="stats-grid stagger">
-        <div class="stat-card"><div class="stat-label">Total obras</div><div class="stat-value">@ViewBag.TotalObras</div><div class="stat-sub">Disponibles para valorar</div></div>
-        <div class="stat-card"><div class="stat-label">Valoraciones</div><div class="stat-value">@ViewBag.TotalValoraciones</div><div class="stat-sub">Peritajes en el sistema</div></div>
-    </div>
-    <div class="role-callout"><span>⚖</span><span>Como <strong>Perito</strong> puedes crear y editar valoraciones periciales de las obras de la colección. Solo el Administrador puede eliminar registros.</span></div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Acceso rápido</h2>
-    </div>
-    <div class="row g-3 stagger" style="max-width:600px;">
-        <div class="col-md-6">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Valoraciones</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Valoracions" asp-action="Index" class="btn btn-outline-light btn-sm">Ver todas las valoraciones</a>
-                    <a asp-controller="Valoracions" asp-action="Create" class="btn btn-primary btn-sm">+ Nueva valoración</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="stat-card" style="padding:1.1rem;">
-                <div class="stat-label">Catálogo de obras</div>
-                <div class="d-flex flex-column gap-2 mt-2">
-                    <a asp-controller="Obras" asp-action="Index" class="btn btn-outline-light btn-sm">Consultar obras y valores</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Últimas valoraciones</h2>
-        <a asp-controller="Valoracions" asp-action="Index" class="btn btn-sm btn-outline-light">Ver todas</a>
-    </div>
-    @if (ViewBag.UltimasValoraciones != null && ((List<PGDCP.Models.Valoracion>)ViewBag.UltimasValoraciones).Count > 0)
-    {
-        <div class="table-wrapper fade-in">
-            <table class="table">
-                <thead><tr><th>Obra</th><th>Valor determinado</th><th>Fecha</th><th></th></tr></thead>
-                <tbody>
-                    @foreach (var v in (List<PGDCP.Models.Valoracion>)ViewBag.UltimasValoraciones)
-                    {
-                        <tr>
-                            <td><span style="font-family:var(--fd);color:var(--ivory);">@(v.Obra?.Titulo ?? $"#{v.ObraId}")</span></td>
-                            <td><span style="color:var(--gold-light);font-family:var(--fd);">$@v.ValorEstimado.ToString("N0")</span></td>
-                            <td style="color:var(--text-muted);font-size:.82rem;">@v.FechaValoracion.ToString("dd/MM/yyyy")</td>
-                            <td><a class="action-link" asp-controller="Valoracions" asp-action="Details" asp-route-id="@v.Id">Ver →</a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
 }
 else
 {
-    <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
-        <h1 style="margin:0;">Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1>
-        <span class="badge badge-rose">Coleccionista</span>
-    </div>
-    <div class="stats-grid stagger">
-        <div class="stat-card"><div class="stat-label">Mis obras</div><div class="stat-value">@ViewBag.TotalObras</div><div class="stat-sub">Piezas en tu colección</div></div>
-        <div class="stat-card"><div class="stat-label">Valor total estimado</div><div class="stat-value" style="font-size:1.7rem;">$@String.Format("{0:N0}", ViewBag.ValorTotal)</div><div class="stat-sub">USD estimado</div></div>
-    </div>
-    <div class="role-callout"><span>🖼</span><span>Como <strong>Coleccionista</strong> puedes registrar y gestionar tus propias obras. Para acceder a módulos de conservación o valoración, contacta al Administrador.</span></div>
-    <hr class="divider">
-    <div class="page-header" style="margin-bottom:1.1rem;">
-        <h2 style="font-size:1.5rem;">Mi colección</h2>
-        <a asp-controller="Obras" asp-action="Create" class="btn btn-primary btn-sm">+ Registrar obra</a>
-    </div>
-    @if (ViewBag.ObrasRecientes != null && ((List<Obra>)ViewBag.ObrasRecientes).Count > 0)
-    {
-        <div class="table-wrapper fade-in">
-            <table class="table">
-                <thead><tr><th>Título</th><th>Autor</th><th>Época</th><th>Valor estimado</th><th></th></tr></thead>
-                <tbody>
-                    @foreach (var obra in (List<Obra>)ViewBag.ObrasRecientes)
-                    {
-                        <tr>
-                            <td><span style="font-family:var(--fd);color:var(--ivory);">@obra.Titulo</span></td>
-                            <td>@obra.Autor</td>
-                            <td><span class="badge badge-teal">@obra.Epoca?.Nombre</span></td>
-                            <td><span style="color:var(--gold-light);font-family:var(--fd);">$@obra.ValorEstimado.ToString("N0")</span></td>
-                            <td>
-                                <div class="action-links">
-                                    <a class="action-link" asp-controller="Obras" asp-action="Details" asp-route-id="@obra.Id">Ver</a>
-                                    <span class="action-sep">·</span>
-                                    <a class="action-link" asp-controller="Obras" asp-action="Edit" asp-route-id="@obra.Id">Editar</a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    @* --- VISTA PÚBLICA (LO QUE SE VE AL INICIO) --- *@
+    <div class="container mt-5">
+        <div style="background-color: #fdfcf9; background-image: radial-gradient(#e2d9c5 0.5px, transparent 0.5px); background-size: 20px 20px; border: 1px solid #e2d9c5; border-radius: 20px; padding: 80px 20px; text-align: center; margin-bottom: 40px;">
+            <span style="color: #8B7344; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; font-size: 14px; margin-bottom: 15px; display: block;">
+                Patrimonio Cultural
+            </span>
+            <h1 style="font-size: 60px; color: #2c2c2c; line-height: 1.1; margin: 0 0 20px 0; font-family: 'Playfair Display', serif;">
+                Plataforma de Gestión del<br><span style="color: #8B7344;">Patrimonio Cultural</span>
+            </h1>
+            <p style="color: #6c757d; max-width: 650px; margin: 0 auto; font-size: 18px; line-height: 1.6;">
+                Una solución integral para la documentación, protección y puesta en valor de colecciones privadas con los más altos estándares profesionales.
+            </p>
         </div>
-        <div style="margin-top:.75rem;">
-            <a asp-controller="Obras" asp-action="Index" class="action-link">Ver todas mis obras →</a>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4 text-center">
+                <div class="p-4 h-100 shadow-sm" style="background: white; border: 1px solid #e2d9c5;">
+                    <div style="font-size: 40px; color: #8B7344; margin-bottom: 20px;">📋</div>
+                    <h4 style="font-family: 'Playfair Display', serif;">Catalogación</h4>
+                    <p class="text-muted small">Registro detallado de piezas con metadatos técnicos, autoría y estados de conservación.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4 h-100 shadow-sm" style="background: white; border: 1px solid #e2d9c5;">
+                    <div style="font-size: 40px; color: #8B7344; margin-bottom: 20px;">🛡️</div>
+                    <h4 style="font-family: 'Playfair Display', serif;">Conservación</h4>
+                    <p class="text-muted small">Seguimiento de intervenciones técnicas y mantenimiento preventivo.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4 h-100 shadow-sm" style="background: white; border: 1px solid #e2d9c5;">
+                    <div style="font-size: 40px; color: #8B7344; margin-bottom: 20px;">💰</div>
+                    <h4 style="font-family: 'Playfair Display', serif;">Valoración</h4>
+                    <p class="text-muted small">Control de peritajes y estimaciones de valor de mercado actualizadas.</p>
+                </div>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="empty-state">
-            <div class="empty-state-icon">🖼</div>
-            <h3>Tu colección está vacía</h3>
-            <p>Registra tu primera obra para comenzar a gestionar tu patrimonio cultural.</p>
-            <a asp-controller="Obras" asp-action="Create" class="btn btn-primary mt-3">Registrar primera obra</a>
-        </div>
-    }
+    </div>
 }

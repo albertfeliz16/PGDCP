@@ -139,5 +139,27 @@ namespace PGDCP.Controllers
 
             return RedirectToAction(nameof(Usuarios));
         }
+        [Authorize(Roles = "Administrador")]
+        public IActionResult Roles()
+        {
+            
+            var roles = _roleManager.Roles.ToList();
+            return View(roles);
+        }
+        [HttpPost]
+        public async Task<IActionResult> EjecutarMantenimiento()
+        {
+            
+            try
+            {
+                await _context.Database.MigrateAsync();
+                TempData["Success"] = "Sincronización de base de datos completada con éxito.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error en el mantenimiento: " + ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
