@@ -17,10 +17,13 @@ namespace PGDCP.Controllers
         public async Task<IActionResult> Index(string? buscar)
         {
             var query = _context.Conservaciones.Include(c => c.Obra).AsQueryable();
+
             if (!string.IsNullOrEmpty(buscar))
                 query = query.Where(c =>
                     c.Diagnostico.Contains(buscar) ||
-                    (c.Tratamiento != null && c.Tratamiento.Contains(buscar)));
+                    (c.Tratamiento != null && c.Tratamiento.Contains(buscar)) ||
+                    c.EstadoConservacion.Contains(buscar));
+
             ViewBag.Buscar = buscar;
             return View(await query.OrderByDescending(c => c.FechaIntervencion).ToListAsync());
         }
@@ -35,25 +38,26 @@ namespace PGDCP.Controllers
 
         public IActionResult Create()
         {
-            ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo");
+            ViewData["ObraId"] = new SelectList(_context.Obras.OrderBy(o => o.Titulo), "Id", "Titulo");
             return View();
         }
 
-        // ── CREATE POST — fecha automática ──
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ObraId,Diagnostico,Tratamiento")] Conservacion conservacion)
+            [Bind("ObraId,Diagnostico,Tratamiento,EstadoConservacion,TipoIntervencion,CostoIntervencion")] Conservacion conservacion)
         {
             if (ModelState.IsValid)
             {
                 // Fecha de hoy automáticamente
                 conservacion.FechaIntervencion = DateTime.Today;
-                // Restaurador registrado automáticamente
+
+                // El Restaurador es el usuario logueado actualmente
                 conservacion.RestauradorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 _context.Add(conservacion);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Registro de conservación guardado.";
+
+                TempData["Success"] = "Registro de conservación guardado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo", conservacion.ObraId);
@@ -65,15 +69,17 @@ namespace PGDCP.Controllers
             if (id == null) return NotFound();
             var c = await _context.Conservaciones.FindAsync(id);
             if (c == null) return NotFound();
+
             ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo", c.ObraId);
             return View(c);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,ObraId,Diagnostico,Tratamiento,FechaIntervencion,RestauradorId")] Conservacion conservacion)
+            [Bind("Id,ObraId,Diagnostico,Tratamiento,FechaIntervencion,RestauradorId,EstadoConservacion,TipoIntervencion,CostoIntervencion")] Conservacion conservacion)
         {
             if (id != conservacion.Id) return NotFound();
+
             if (ModelState.IsValid)
             {
                 try
@@ -86,7 +92,7 @@ namespace PGDCP.Controllers
                     if (!_context.Conservaciones.Any(e => e.Id == conservacion.Id)) return NotFound();
                     else throw;
                 }
-                TempData["Success"] = "Registro actualizado.";
+                TempData["Success"] = "Registro de conservación actualizado.";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo", conservacion.ObraId);
@@ -109,7 +115,8 @@ namespace PGDCP.Controllers
             var c = await _context.Conservaciones.FindAsync(id);
             if (c != null) _context.Conservaciones.Remove(c);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Registro eliminado.";
+
+            TempData["Success"] = "El registro ha sido eliminado permanentemente.";
             return RedirectToAction(nameof(Index));
         }
     }

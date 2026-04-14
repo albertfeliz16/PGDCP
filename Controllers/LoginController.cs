@@ -113,9 +113,23 @@ namespace PGDCP.Controllers
 
             await _signInManager.SignInAsync(user, isPersistent: recordarme);
 
-            return esAdmin
-                ? RedirectToAction("Index", "Admin")
-                : Redirect("/Perfil");
+            if (esAdmin)
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+            else if (User.IsInRole("Perito"))
+            {
+                return RedirectToAction("Index", "Valoracions");
+            }
+            else if (User.IsInRole("Restaurador"))
+            {
+                return RedirectToAction("Index", "Conservacions");
+            }
+            else
+            {
+                // Esto es lo que enviará a Albert Feliz y a los demás al Inicio
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost, ValidateAntiForgeryToken]

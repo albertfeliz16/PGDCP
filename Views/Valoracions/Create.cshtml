@@ -3,66 +3,126 @@
     ViewData["Title"] = "Nueva Valoración";
 }
 
+<style>
+    /* Tipografía elegante para el precio */
+    #valordeterminado_input {
+        font-family: var(--fd) !important;
+        color: #8B7355 !important;
+        font-weight: 600 !important;
+        background-color: transparent !important;
+    }
+
+    /* Forzar el color del botón SIEMPRE, no solo en hover */
+    .btn-custom-gold {
+        background-color: #8B7355 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 0.6rem 2rem !important;
+        text-transform: uppercase !important;
+        font-size: 0.8rem !important;
+        letter-spacing: 1px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .btn-custom-gold:hover {
+            background-color: #6d5a43 !important; /* Un tono más oscuro al pasar el mouse */
+            color: #ffffff !important;
+        }
+
+    .btn-custom-cancel {
+        background-color: #ffffff !important;
+        color: var(--text-muted) !important;
+        border: 1px solid #ddd !important;
+        padding: 0.6rem 2rem !important;
+        text-transform: uppercase !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Contenedor de inputs */
+    .form-control, .form-select {
+        border: none !important;
+        background-color: #f2ede4 !important;
+    }
+</style>
+
 <div class="page-header">
-    <h1>Nueva Valoración Pericial</h1>
+    <h1 style="font-family: var(--fd);">Nueva Valoración Pericial</h1>
     <a asp-action="Index" class="btn btn-sm" style="color:var(--text-muted);">← Volver</a>
 </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-7">
-        <div class="card fade-in">
-            <div class="card-header">Datos del Peritaje</div>
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
-
-                    <!-- Fecha oculta, se asigna automáticamente en el servidor -->
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-8">
+        <div class="card fade-in border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="text-uppercase mb-0" style="letter-spacing:1px; font-size:0.85rem; color: #8B7355;">Datos del Peritaje</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="FechaValoracion" />
 
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <div class="form-group">
-                                <label asp-for="ObraId" class="form-label">Obra *</label>
-                                <select asp-for="ObraId" class="form-select" asp-items="ViewBag.ObraId">
-                                    <option value="">— Seleccione una obra —</option>
-                                </select>
-                                <span asp-validation-for="ObraId" class="field-validation-error"></span>
-                            </div>
+                            <label asp-for="ObraId" class="form-label small fw-bold text-uppercase">Obra *</label>
+                            <select asp-for="ObraId" class="form-select" asp-items="ViewBag.ObraId">
+                                <option value="">— Seleccione una obra —</option>
+                            </select>
                         </div>
-
-                        <!-- Fecha visible pero no editable -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label class="form-label">Fecha</label>
-                                <input type="text" class="form-control"
-                                       value="@DateTime.Today.ToString("dd/MM/yyyy")"
-                                       disabled />
+                            <label class="form-label small fw-bold text-uppercase">Fecha</label>
+                            <input type="text" class="form-control" value="@DateTime.Today.ToString("dd/MM/yyyy")" disabled />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="MetodoValoracion" class="form-label small fw-bold text-uppercase">Método de Valoración</label>
+                            <select asp-for="MetodoValoracion" class="form-select">
+                                <option value="Comparativo">Comparativo de Mercado</option>
+                                <option value="Coste">Coste de Reposición</option>
+                                <option value="Historico">Valor Histórico / Simbólico</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EstadoAutenticidad" class="form-label small fw-bold text-uppercase">Autenticidad</label>
+                            <select asp-for="EstadoAutenticidad" class="form-select">
+                                <option value="Confirmada">Confirmada / Original</option>
+                                <option value="Atribuida">Atribuida al Autor/Taller</option>
+                                <option value="Estudio">En Estudio Técnico</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="ValorEstimado" class="form-label small fw-bold text-uppercase">Valor Determinado (USD) *</label>
+                            <div class="input-group input-group-lg" style="background-color: #f2ede4; border-radius: 4px;">
+                                <span class="input-group-text border-0 bg-transparent" style="color: #8B7355; font-size: 1.5rem;">$</span>
+                                <input asp-for="ValorEstimado" type="number" step="0.01" class="form-control border-0 bg-transparent" id="valordeterminado_input" />
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <div class="form-group">
-                                <label asp-for="ValorEstimado" class="form-label">Valor Determinado (USD) *</label>
-                                <input asp-for="ValorEstimado" class="form-control" placeholder="0.00" />
-                                <span asp-validation-for="ValorEstimado" class="field-validation-error"></span>
-                            </div>
+                            <label asp-for="FactoresAjuste" class="form-label small fw-bold text-uppercase">Factores de Ajuste</label>
+                            <input asp-for="FactoresAjuste" class="form-control" placeholder="Ej: Firma certificada (+)..." />
                         </div>
+
                         <div class="col-12">
-                            <div class="form-group">
-                                <label asp-for="Observaciones" class="form-label">Observaciones y notas técnicas</label>
-                                <textarea asp-for="Observaciones" class="form-control" rows="4"
-                                          placeholder="Contexto del peritaje, metodología empleada, notas adicionales..."></textarea>
-                            </div>
+                            <label asp-for="Observaciones" class="form-label small fw-bold text-uppercase">Observaciones Técnicas</label>
+                            <textarea asp-for="Observaciones" class="form-control" rows="4"></textarea>
                         </div>
                     </div>
 
-                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:.5rem;">
-                        El perito quedará registrado automáticamente con tu usuario.
-                    </p>
-                    <hr class="divider">
-                    <div class="d-flex gap-2 justify-content-end">
-                        <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Guardar valoración</button>
+                    <div class="mt-4" style="color:var(--text-muted); font-size:.78rem;">
+                        <i class="bi bi-shield-check me-1"></i> El perito quedará registrado automáticamente.
+                    </div>
+                    
+                    <hr class="divider my-4">
+                    
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-end gap-3 pe-4">
+                            <a asp-action="Index" class="btn btn-custom-cancel">Cancelar</a>
+                            <button type="submit" class="btn btn-custom-gold">
+                                Guardar Valoración
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -74,5 +134,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
 }

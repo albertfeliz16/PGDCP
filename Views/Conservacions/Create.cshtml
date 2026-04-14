@@ -9,14 +9,13 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-7">
+    <div class="col-lg-8">
         <div class="card fade-in">
             <div class="card-header">Nueva Intervención de Restauración</div>
             <div class="card-body">
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-                    <!-- Fecha oculta, se asigna automáticamente en el servidor -->
                     <input type="hidden" asp-for="FechaIntervencion" />
 
                     <div class="row g-3">
@@ -30,13 +29,48 @@
                             </div>
                         </div>
 
-                        <!-- Fecha visible pero no editable -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="form-label">Fecha de Intervención</label>
                                 <input type="text" class="form-control"
                                        value="@DateTime.Today.ToString("dd/MM/yyyy")"
-                                       disabled />
+                                       disabled style="background-color: var(--bg-body);" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="EstadoConservacion" class="form-label">Estado Inicial *</label>
+                                <select asp-for="EstadoConservacion" class="form-select">
+                                    <option value="Excelente">Excelente</option>
+                                    <option value="Bueno" selected>Bueno</option>
+                                    <option value="Regular">Regular</option>
+                                    <option value="Critico">Crítico / Urgente</option>
+                                </select>
+                                <span asp-validation-for="EstadoConservacion" class="field-validation-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="TipoIntervencion" class="form-label">Tipo de Trabajo *</label>
+                                <select asp-for="TipoIntervencion" class="form-select">
+                                    <option value="Preventiva">Cons. Preventiva</option>
+                                    <option value="Curativa">Cons. Curativa</option>
+                                    <option value="Restauracion">Restauración</option>
+                                </select>
+                                <span asp-validation-for="TipoIntervencion" class="field-validation-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="CostoIntervencion" class="form-label">Costo (USD)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0" style="background-color: var(--bg-body);">$</span>
+                                    <input asp-for="CostoIntervencion" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="CostoIntervencion" class="field-validation-error"></span>
                             </div>
                         </div>
 
@@ -48,22 +82,28 @@
                                 <span asp-validation-for="Diagnostico" class="field-validation-error"></span>
                             </div>
                         </div>
+
                         <div class="col-12">
                             <div class="form-group">
                                 <label asp-for="Tratamiento" class="form-label">Tratamiento aplicado</label>
                                 <textarea asp-for="Tratamiento" class="form-control" rows="3"
                                           placeholder="Describe el tratamiento o intervención realizada..."></textarea>
+                                <span asp-validation-for="Tratamiento" class="field-validation-error"></span>
                             </div>
                         </div>
                     </div>
 
-                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:.5rem;">
-                        El restaurador quedará registrado automáticamente con tu usuario.
+                    <p style="color:var(--text-muted);font-size:.78rem;margin-top:1rem;">
+                        <i class="bi bi-info-circle me-1"></i> El restaurador quedará registrado automáticamente con tu usuario.
                     </p>
+                    
                     <hr class="divider">
+                    
                     <div class="d-flex gap-2 justify-content-end">
                         <a asp-action="Index" class="btn btn-outline-light">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Guardar registro</button>
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--gold); border:none; padding: 0.6rem 2rem;">
+                            Guardar registro
+                        </button>
                     </div>
                 </form>
             </div>
@@ -75,5 +115,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
 }

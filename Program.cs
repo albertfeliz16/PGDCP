@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using PGDCP;
 using PGDCP.Data;
 using PGDCP.Models;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -10,6 +12,17 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory(),
     WebRootPath = "wwwroot"
 });
+
+// ── CONFIGURACIÓN DE CULTURA (Dólares) ──
+var defaultCulture = new CultureInfo("en-US");
+defaultCulture.NumberFormat.CurrencySymbol = "$";
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+};
 
 // ── Servicios ──
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -43,6 +56,10 @@ builder.Services.AddRazorPages();
 var app = builder.Build();
 
 // ── Middleware ──
+
+// IMPORTANTE: Aplicar la localización antes de Routing y Auth
+app.UseRequestLocalization(localizationOptions);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -55,7 +72,9 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -65,7 +84,6 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 // ── Crear solo los roles por defecto ──
-// El usuario administrador se crea manualmente desde la base de datos
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -73,8 +91,12 @@ using (var scope = app.Services.CreateScope())
 
     string[] roles = { "Administrador", "Restaurador", "Perito", "Coleccionista" };
     foreach (var role in roles)
+    {
         if (!await roleManager.RoleExistsAsync(role))
+        {
             await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
 }
 
 app.Run();

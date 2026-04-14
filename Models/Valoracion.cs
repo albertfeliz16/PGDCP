@@ -29,5 +29,9 @@ namespace PGDCP.Models
 
         [Display(Name = "ID del Perito")]
         public string? PeritoId { get; set; }
+
+        public string MetodoValoracion { get; set; } = "Comparativo"; // Comparativo, Reposición, Histórico
+        public string EstadoAutenticidad { get; set; } = "Confirmada"; // Confirmada, Atribuida, En Estudio
+        public string? FactoresAjuste { get; set; } // Notas sobre plusvalía o minusvalía
     }
 }

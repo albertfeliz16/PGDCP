@@ -70,10 +70,10 @@ namespace PGDCP.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,Coleccionista")]
         public async Task<IActionResult> Create(
-            [Bind("Titulo,Autor,CategoriaId,EpocaId,EstiloId,UbicacionId,Descripcion,FechaAdquisicion,ValorEstimado")] Obra obra,
-            IFormFile? imagenArchivo)
+            [Bind("Titulo,Autor,CategoriaId,EpocaId,EstiloId,UbicacionId,TecnicaId,Descripcion,FechaAdquisicion,ValorEstimado")] Obra obra,
+            IFormFile? imagenArchivo,
+            int[] materialesSeleccionados)
         {
-            
             if (!string.IsNullOrEmpty(obra.Titulo))
             {
                 bool existe = await _context.Obras.AnyAsync(o => o.Titulo.ToLower().Trim() == obra.Titulo.ToLower().Trim());
@@ -86,26 +86,27 @@ namespace PGDCP.Controllers
             if (ModelState.IsValid)
             {
                 obra.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
                 _context.Add(obra);
                 await _context.SaveChangesAsync();
+
+                // Guardar Materiales Seleccionados
+                if (materialesSeleccionados != null)
+                {
+                    foreach (var matId in materialesSeleccionados)
+                    {
+                        _context.ObraMateriales.Add(new ObraMaterial { ObraId = obra.Id, MaterialId = matId });
+                    }
+                    await _context.SaveChangesAsync();
+                }
 
                 if (imagenArchivo != null && imagenArchivo.Length > 0)
                 {
                     var urlImagen = await GuardarImagen(imagenArchivo);
-                    if (urlImagen == null)
+                    if (urlImagen != null)
                     {
-                        ModelState.AddModelError("", "Solo se permiten imágenes (jpg, png, gif, webp) de máximo 5MB.");
-                        CargarCatalogos(obra);
-                        return View(obra);
+                        _context.ObraImagenes.Add(new ObraImagen { ObraId = obra.Id, Url = urlImagen, EsPrincipal = true });
+                        await _context.SaveChangesAsync();
                     }
-                    _context.ObraImagenes.Add(new ObraImagen
-                    {
-                        ObraId = obra.Id,
-                        Url = urlImagen,
-                        EsPrincipal = true
-                    });
-                    await _context.SaveChangesAsync();
                 }
 
                 TempData["Success"] = "Obra registrada correctamente.";
@@ -121,10 +122,13 @@ namespace PGDCP.Controllers
             if (id == null) return NotFound();
             var obra = await _context.Obras
                 .Include(o => o.Imagenes)
+                .Include(o => o.ObraMateriales)
                 .FirstOrDefaultAsync(o => o.Id == id);
             if (obra == null) return NotFound();
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!User.IsInRole("Administrador") && obra.UserId != userId) return Forbid();
+
             CargarCatalogos(obra);
             return View(obra);
         }
@@ -132,12 +136,12 @@ namespace PGDCP.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,Coleccionista")]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,Titulo,Autor,CategoriaId,EpocaId,EstiloId,UbicacionId,Descripcion,FechaAdquisicion,ValorEstimado")] Obra obra,
-            IFormFile? imagenArchivo)
+            [Bind("Id,Titulo,Autor,CategoriaId,EpocaId,EstiloId,UbicacionId,TecnicaId,Descripcion,FechaAdquisicion,ValorEstimado")] Obra obra,
+            IFormFile? imagenArchivo,
+            int[] materialesSeleccionados)
         {
             if (id != obra.Id) return NotFound();
 
-            // --- VALIDACIÓN DE UNICIDAD PARA EDICIÓN (NUEVO) ---
             if (!string.IsNullOrEmpty(obra.Titulo))
             {
                 bool existe = await _context.Obras.AnyAsync(o =>
@@ -157,29 +161,39 @@ namespace PGDCP.Controllers
                     obra.UserId = obraOriginal?.UserId;
 
                     _context.Update(obra);
+
+                    // Actualizar Materiales (Borrar anteriores y poner nuevos)
+                    var antiguosMateriales = _context.ObraMateriales.Where(om => om.ObraId == id);
+                    _context.ObraMateriales.RemoveRange(antiguosMateriales);
+
+                    if (materialesSeleccionados != null)
+                    {
+                        foreach (var matId in materialesSeleccionados)
+                        {
+                            _context.ObraMateriales.Add(new ObraMaterial { ObraId = id, MaterialId = matId });
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
 
                     if (imagenArchivo != null && imagenArchivo.Length > 0)
                     {
                         var urlImagen = await GuardarImagen(imagenArchivo);
-                        if (urlImagen == null)
+                        if (urlImagen != null)
                         {
-                            ModelState.AddModelError("", "Solo se permiten imágenes (jpg, png, gif, webp) de máximo 5MB.");
-                            CargarCatalogos(obra);
-                            return View(obra);
-                        }
-                        var imagenesAnteriores = await _context.ObraImagenes
-                            .Where(i => i.ObraId == id).ToListAsync();
-                        foreach (var img in imagenesAnteriores)
-                            img.EsPrincipal = false;
+                            var imagenesAnteriores = await _context.ObraImagenes
+                                .Where(i => i.ObraId == id).ToListAsync();
+                            foreach (var img in imagenesAnteriores)
+                                img.EsPrincipal = false;
 
-                        _context.ObraImagenes.Add(new ObraImagen
-                        {
-                            ObraId = obra.Id,
-                            Url = urlImagen,
-                            EsPrincipal = true
-                        });
-                        await _context.SaveChangesAsync();
+                            _context.ObraImagenes.Add(new ObraImagen
+                            {
+                                ObraId = obra.Id,
+                                Url = urlImagen,
+                                EsPrincipal = true
+                            });
+                            await _context.SaveChangesAsync();
+                        }
                     }
 
                     TempData["Success"] = "Obra actualizada correctamente.";
@@ -224,6 +238,8 @@ namespace PGDCP.Controllers
             ViewBag.EpocaId = new SelectList(_context.Epocas.OrderBy(e => e.Nombre), "Id", "Nombre", obra?.EpocaId);
             ViewBag.EstiloId = new SelectList(_context.Estilos.OrderBy(e => e.Nombre), "Id", "Nombre", obra?.EstiloId);
             ViewBag.UbicacionId = new SelectList(_context.Ubicaciones.OrderBy(u => u.Nombre), "Id", "Nombre", obra?.UbicacionId);
+            ViewBag.TecnicaId = new SelectList(_context.Tecnicas.OrderBy(t => t.Nombre), "Id", "Nombre", obra?.TecnicaId);
+
             ViewBag.Materiales = _context.Materiales.OrderBy(m => m.Nombre).ToList();
         }
 
@@ -236,7 +252,7 @@ namespace PGDCP.Controllers
             if (archivo.Length > 5 * 1024 * 1024) return null;
 
             var carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "obras");
-            Directory.CreateDirectory(carpeta);
+            if (!Directory.Exists(carpeta)) Directory.CreateDirectory(carpeta);
 
             var nombreArchivo = Guid.NewGuid().ToString() + extension;
             var rutaCompleta = Path.Combine(carpeta, nombreArchivo);

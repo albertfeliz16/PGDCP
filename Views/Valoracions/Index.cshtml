@@ -59,7 +59,7 @@ else
                                 @if (item.Obra != null) { <span style="font-family:var(--fd);color:var(--ivory);">@item.Obra.Titulo</span> }
                                 else { <span class="badge badge-gold">#@item.ObraId</span> }
                             </td>
-                            <td><span style="color:var(--gold-light);font-family:var(--fd);font-size:1.05rem;">$@item.ValorEstimado.ToString("N0")</span></td>
+                            <td><span style="color:var(--gold-light);font-family:var(--fd);font-size:1.05rem;">@item.ValorEstimado.ToString("C2")</span></td>
                             <td style="color:var(--text-muted);font-size:.82rem;">@item.FechaValoracion.ToString("dd/MM/yyyy")</td>
                             <td style="color:var(--text-muted);font-size:.8rem;">@(item.PeritoId?.Length > 8 ? item.PeritoId[..8] + "..." : item.PeritoId)</td>
                             <td style="color:var(--text-muted);font-size:.82rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@item.Observaciones</td>

@@ -46,9 +46,9 @@ namespace PGDCP.Models
         [DataType(DataType.Date)]
         public DateTime FechaAdquisicion { get; set; } = DateTime.Today;
 
-        
         [Display(Name = "Valor Estimado (USD)")]
-        [Column(TypeName = "decimal(18, 2)")]
+        [Column(TypeName = "decimal(18, 2)")] 
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)] // Fuerza 2 decimales en pantalla
         [Range(0, 9999999999999999.99, ErrorMessage = "El valor debe ser positivo")]
         public decimal ValorEstimado { get; set; }
 

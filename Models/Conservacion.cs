@@ -26,4 +26,9 @@ public class Conservacion
 
     [Display(Name = "ID del Restaurador")]
     public string? RestauradorId { get; set; }
+    public string EstadoConservacion { get; set; } = "Bueno"; // Excelente, Bueno, Regular, Crítico
+
+    public string TipoIntervencion { get; set; } = "Preventiva"; // Preventiva, Curativa, Restauración
+
+    public decimal CostoIntervencion { get; set; }
 }

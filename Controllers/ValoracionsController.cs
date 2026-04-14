@@ -17,10 +17,14 @@ namespace PGDCP.Controllers
         public async Task<IActionResult> Index(string? buscar)
         {
             var query = _context.Valoraciones.Include(v => v.Obra).AsQueryable();
+
             if (!string.IsNullOrEmpty(buscar))
                 query = query.Where(v =>
                     (v.Obra != null && v.Obra.Titulo.Contains(buscar)) ||
-                    (v.Observaciones != null && v.Observaciones.Contains(buscar)));
+                    (v.Observaciones != null && v.Observaciones.Contains(buscar)) ||
+                    v.MetodoValoracion.Contains(buscar) ||
+                    v.EstadoAutenticidad.Contains(buscar));
+
             ViewBag.Buscar = buscar;
             return View(await query.OrderByDescending(v => v.FechaValoracion).ToListAsync());
         }
@@ -35,25 +39,24 @@ namespace PGDCP.Controllers
 
         public IActionResult Create()
         {
-            ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo");
+            ViewData["ObraId"] = new SelectList(_context.Obras.OrderBy(o => o.Titulo), "Id", "Titulo");
             return View();
         }
 
-        // fecha automática ──
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ObraId,ValorEstimado,Observaciones")] Valoracion valoracion)
+            [Bind("ObraId,ValorEstimado,Observaciones,MetodoValoracion,EstadoAutenticidad,FactoresAjuste")] Valoracion valoracion)
         {
             if (ModelState.IsValid)
             {
-                // Fecha de hoy automáticamente
+                // Fecha y Perito automáticos
                 valoracion.FechaValoracion = DateTime.Today;
-                // Perito registrado automáticamente
                 valoracion.PeritoId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 _context.Add(valoracion);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Valoración registrada correctamente.";
+
+                TempData["Success"] = "Dictamen pericial guardado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo", valoracion.ObraId);
@@ -65,15 +68,17 @@ namespace PGDCP.Controllers
             if (id == null) return NotFound();
             var v = await _context.Valoraciones.FindAsync(id);
             if (v == null) return NotFound();
+
             ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo", v.ObraId);
             return View(v);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,ObraId,ValorEstimado,Observaciones,PeritoId,FechaValoracion")] Valoracion valoracion)
+            [Bind("Id,ObraId,ValorEstimado,Observaciones,PeritoId,FechaValoracion,MetodoValoracion,EstadoAutenticidad,FactoresAjuste")] Valoracion valoracion)
         {
             if (id != valoracion.Id) return NotFound();
+
             if (ModelState.IsValid)
             {
                 try
@@ -86,7 +91,7 @@ namespace PGDCP.Controllers
                     if (!_context.Valoraciones.Any(e => e.Id == valoracion.Id)) return NotFound();
                     else throw;
                 }
-                TempData["Success"] = "Valoración actualizada.";
+                TempData["Success"] = "Valoración pericial actualizada.";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ObraId"] = new SelectList(_context.Obras, "Id", "Titulo", valoracion.ObraId);
@@ -109,7 +114,8 @@ namespace PGDCP.Controllers
             var v = await _context.Valoraciones.FindAsync(id);
             if (v != null) _context.Valoraciones.Remove(v);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Valoración eliminada.";
+
+            TempData["Success"] = "El registro ha sido eliminado.";
             return RedirectToAction(nameof(Index));
         }
     }

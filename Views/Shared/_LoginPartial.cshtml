@@ -30,11 +30,10 @@
         }
 
         <li class="nav-item">
-            @* LÍNEA ACTUALIZADA: Ahora apunta a tu controlador y vista de Seguridad *@
             <a class="nav-link text-uppercase fw-bold"
                    asp-area=""
-                   asp-controller="Configuracion"
-                   asp-action="Seguridad"
+                   asp-controller="Home"
+                   asp-action="Index"
                    style="color:var(--gold)!important; font-size:.78rem; letter-spacing: 0.5px;">
                 @User.Identity?.Name
             </a>

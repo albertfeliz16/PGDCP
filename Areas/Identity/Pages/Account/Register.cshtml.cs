@@ -158,7 +158,7 @@ namespace PGDCP.Areas.Identity.Pages.Account
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        return Redirect("/Perfil");
+                        return RedirectToAction("Index", "Home", new { area = "" });
                     }
                 }
 

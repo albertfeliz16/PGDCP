@@ -21,10 +21,18 @@
     <div class="container py-4">
         <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
             @if (User.IsInRole("Administrador")) { 
-                <h1>Panel <em style="color:var(--gold-light);">Administrador</em></h1> <span class="badge-gold">Control total del sistema</span> 
-            } else { 
-                <h1>Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1> <span class="badge-gold" style="background:#e83e8c;">Coleccionista</span> 
-            }
+    <h1>Panel <em style="color:var(--gold-light);">Administrador</em></h1> 
+    <span class="badge-gold">Control total del sistema</span> 
+} else if (User.IsInRole("Perito")) { 
+    <h1>Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1> 
+    <span class="badge-gold" style="background:#8B7344;">Perito</span> 
+} else if (User.IsInRole("Restaurador")) { 
+    <h1>Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1> 
+    <span class="badge-gold" style="background:#4A707A;">Restaurador</span> 
+} else { 
+    <h1>Bienvenido, <em style="color:var(--gold-light);">@userName</em></h1> 
+    <span class="badge-gold" style="background:#e83e8c;">Coleccionista</span> 
+}
         </div>
 
         <div class="row g-3 mb-4">
