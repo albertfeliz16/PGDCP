@@ -29,14 +29,24 @@
             <li class="nav-item"><span class="role-pill role-col">Coleccionista</span></li>
         }
 
-        <li class="nav-item">
-            <a class="nav-link text-uppercase fw-bold"
-                   asp-area=""
-                   asp-controller="Home"
-                   asp-action="Index"
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-uppercase fw-bold"
+                   href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
                    style="color:var(--gold)!important; font-size:.78rem; letter-spacing: 0.5px;">
                 @User.Identity?.Name
             </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="background-color: #fdfcf9; border: 1px solid #e2d9c5 !important;">
+                <li>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Email" style="font-size: 0.8rem;">
+                        <i class="bi bi-envelope me-2"></i> Cambiar Correo
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/ChangePassword" style="font-size: 0.8rem;">
+                        <i class="bi bi-lock me-2"></i> Cambiar Contraseña
+                    </a>
+                </li>
+            </ul>
         </li>
 
         <li class="nav-item">
